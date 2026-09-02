@@ -332,9 +332,9 @@ if not df_matriz.empty:
             )
 
             st.markdown("---")
-            st.header("Sección 8: Usos e Integración SIL")
+            st.header("Sección 8: Usos de la Información")
             uso_interno = st.text_area(
-                "8.1 Uso Interno Actual de la Información:"
+                "8.1 ¿Cual es el uso Interno Actual de la Información que generan?:"
             )
             uso_sil = st.text_area(
                 "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:"
