@@ -46,17 +46,6 @@ if not df_matriz.empty:
         "✉️ **¿Preguntas o información adicional?** lvega@imbabura.gob.ec"
     )
 
-    # 📥 BOTÓN OFICIAL DE DESCARGA COLOCADO EN LA POSICIÓN CORRECTA
-    if os.path.exists(EXCEL_DIAGNOSTICO):
-        with open(EXCEL_DIAGNOSTICO, "rb") as file:
-            st.download_button(
-                label="📥 Descargar Base de Datos Consolidada (Excel)",
-                data=file,
-                file_name="diagnostico_sil_gadpi_2026.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                type="secondary",
-            )
-
     st.markdown("---")
 
     columnas = list(df_matriz.columns)
