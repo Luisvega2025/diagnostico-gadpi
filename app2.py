@@ -4,7 +4,9 @@ import streamlit as st
 import urllib.parse
 import urllib.request
 
+# DEFINICIÓN DE ARCHIVOS AL INICIO PARA EVITAR ERRORES
 EXCEL_MATRIZ = "matriz_gad.xlsx"
+EXCEL_DIAGNOSTICO = "diagnostico_sil_gadpi_2026.xlsx"
 
 
 @st.cache_data
@@ -43,7 +45,8 @@ if not df_matriz.empty:
     st.info(
         "✉️ **¿Preguntas o información adicional?** lvega@imbabura.gob.ec"
     )
-    # 📥 BOTÓN OFICIAL DE DESCARGA DE LA BASE DE DATOS DEL SIL
+
+    # 📥 BOTÓN OFICIAL DE DESCARGA COLOCADO EN LA POSICIÓN CORRECTA
     if os.path.exists(EXCEL_DIAGNOSTICO):
         with open(EXCEL_DIAGNOSTICO, "rb") as file:
             st.download_button(
@@ -51,7 +54,7 @@ if not df_matriz.empty:
                 data=file,
                 file_name="diagnostico_sil_gadpi_2026.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                type="secondary"
+                type="secondary",
             )
 
     st.markdown("---")
@@ -106,20 +109,23 @@ if not df_matriz.empty:
 
         def guardar_datos_nube(registro_dicc):
             try:
-                # Guardamos directamente en el almacenamiento persistente del servidor web
                 df_nuevo = pd.DataFrame([registro_dicc])
-                
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
-                    df_final = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                    df_final = pd.concat(
+                        [df_existente, df_nuevo], ignore_index=True
+                    )
                 else:
                     df_final = df_nuevo
-                
                 df_final.to_excel(EXCEL_DIAGNOSTICO, index=False)
-                st.success("¡Ficha de diagnóstico guardada con éxito en el servidor central!")
+                st.success(
+                    "¡Ficha de diagnóstico guardada con éxito en el servidor central!"
+                )
                 st.toast("¡Registro guardado con éxito! 👍", icon="👍")
             except Exception as e:
-                st.error(f"Error en el puente de comunicación: {e}")
+                st.error(
+                    f"Error al escribir en la base de datos del servidor: {e}"
+                )
 
 
         if aplica_info == "No":
@@ -351,8 +357,10 @@ if not df_matriz.empty:
                         "Anio GIS": anio_gis,
                         "Escala GIS": escala_gis,
                         "Formato GIS": ", ".join(formato_gis),
-                        "Unidad Medida": unidad_medida,
-                        "Fuente Origen": fuente_origen,
+                        "Unidad Medida": unity_medida
+                        if "unity_medida" in locals()
+                        else unidad_medida,
+                        "Fuente Origin": fuente_origen,
                         "Nombre Fuente": nombre_fuente,
                         "Unidad Prov": unidad_prov,
                         "Inst Ext Prov": inst_ext_prov,
