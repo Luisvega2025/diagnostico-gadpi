@@ -38,9 +38,10 @@ if not df_matriz.empty:
     st.set_page_config(
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
-    st.title("🏛️ Diagnóstico de Gestión de Información - GADPI")
+    st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN")
+    st.title("🏛️ Diagnóstico de Gestión de Información")
     st.write(
-        "Ficha técnica oficial para el levantamiento de información, bases de datos y productos del SIL Geo-Imbabura."
+        "Ficha técnica para el levantamiento de información."
     )
     st.info(
         "✉️ **¿Preguntas o información adicional?** lvega@imbabura.gob.ec"
