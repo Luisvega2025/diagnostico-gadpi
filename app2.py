@@ -38,7 +38,7 @@ if not df_matriz.empty:
     st.set_page_config(
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
-    st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN")
+    st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN Y COOPERACIÓN")
     st.title("🏛️ Diagnóstico de Gestión de Información")
     st.write(
         "Ficha técnica para el levantamiento de información."
