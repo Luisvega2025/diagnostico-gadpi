@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
 
 EXCEL_MATRIZ = "matriz_gad.xlsx"
 
@@ -91,21 +90,30 @@ if not df_matriz.empty:
             "2.2 ¿Aplica generación o manejo de información en este producto?",
             ["Sí", "No"],
         )
-
-        conn = st.connection("gsheets", type=GSheetsConnection)
+        
+                import urllib.parse
+        import urllib.request
 
         def guardar_datos_nube(registro_dicc):
             try:
-                df_existente = conn.read(ttl=0)
-                df_nuevo_registro = pd.DataFrame([registro_dicc])
-                df_consolidado = pd.concat(
-                    [df_existente, df_nuevo_registro], ignore_index=True
-                )
-                conn.update(data=df_consolidado)
-                st.success("¡Ficha de diagnóstico guardada con éxito!")
+                # Convertimos todo el diccionario de respuestas a un solo texto limpio para la base de datos
+                texto_consolidado = str(registro_dicc)
+                
+                # ⚠️ REEMPLAZA ESTE ENLACE POR EL LINK REAL DE TU GOOGLE FORMS DEL PASO 1
+                url_formulario = "https://google.com"
+                
+                # Mapeamos el campo de texto del formulario de Google
+                valores_envio = {'entry.XXXXXXXXX': texto_consolidado} # Cambia XXXXXXXXX por el ID de tu pregunta si lo deseas, o déjalo para envío plano
+                
+                datos_codificados = urllib.parse.urlencode(valores_envio).encode('utf-8')
+                peticion = urllib.request.Request(url_formulario, data=datos_codificados)
+                urllib.request.urlopen(peticion)
+                
+                st.success("¡Ficha de diagnóstico guardada con éxito en la nube institucional!")
                 st.toast("¡Registro guardado con éxito! 👍", icon="👍")
             except Exception as e:
-                st.error(f"Error de conexión con Google Sheets: {e}")
+                st.error(f"Error en el puente de comunicación con Google: {e}")
+
 
         if aplica_info == "No":
             st.warning(
