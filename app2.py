@@ -62,12 +62,12 @@ if not df_matriz.empty:
     try:
         st.header("Sección 1: Identificación del Informante")
         dir_opcion = st.selectbox(
-            "1.1 Dirección General / Área Sustantiva:",
+            "1.1 Direcciones o Áreas:",
             sorted(df_matriz[col_dir].dropna().unique()),
         )
         df_f_sub = df_matriz[df_matriz[col_dir] == dir_opcion]
         sub_opcion = st.selectbox(
-            "1.2 Subdirección / Jefatura / Unidad Orgánica:",
+            "1.2 Subdirección / Jefatura / Unidad:",
             sorted(df_f_sub[col_sub].dropna().unique()),
         )
         tecnico_resp = st.text_input(
@@ -75,12 +75,12 @@ if not df_matriz.empty:
             placeholder="Nombres y Apellidos completos",
         )
         correo_ext = st.text_input(
-            "1.4 Correo Institucional y Extensión Telefónica:",
+            "1.4 Correo Institucional, Extensión Telefónica, cell:",
             placeholder="ejemplo@imbabura.gob.ec - Ext. 0000",
         )
 
         st.markdown("---")
-        st.header("Sección 2: Producto Evaluado")
+        st.header("Sección 2: Producto según Estatuto 2026")
         df_f_prod = df_f_sub[df_f_sub[col_sub] == sub_opcion]
         prod_opcion = st.selectbox(
             "2.1 Seleccione el Producto Institucional del Estatuto Orgánico:",
@@ -298,12 +298,12 @@ if not df_matriz.empty:
             )
 
             st.markdown("---")
-            st.header("Sección 8: Usos e Integración SIL")
+            st.header("Sección 8: Uso de la Información")
             uso_interno = st.text_area(
                 "8.1 Uso Interno Actual de la Información:"
             )
             uso_sil = st.text_area(
-                "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:"
+                "8.2 Potencial Uso:"
             )
             nivel_acceso = st.radio(
                 "8.3 Nivel de Acceso de la Información:",
