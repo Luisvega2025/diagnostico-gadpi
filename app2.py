@@ -86,20 +86,20 @@ if not df_matriz.empty:
     try:
         st.header("Sección 1: Identificación del Informante")
         dir_opcion = st.selectbox(
-            "1.1 Dirección General / Área Sustantiva:",
+            "1.1 Direcciones:",
             sorted(df_matriz[col_dir].dropna().unique()),
         )
         df_f_sub = df_matriz[df_matriz[col_dir] == dir_opcion]
         sub_opcion = st.selectbox(
-            "1.2 Subdirección / Jefatura / Unidad Orgánica:",
+            "1.2 Subdirección / Jefatura / Unidad:",
             sorted(df_f_sub[col_sub].dropna().unique()),
         )
         tecnico_resp = st.text_input(
-            "1.3 Nombre del Técnico Responsable del Llenado:",
+            "1.3 Nombre del Técnico Responsable del llenado:",
             placeholder="Nombres y Apellidos completos",
         )
         correo_ext = st.text_input(
-            "1.4 Correo Institucional y Extensión Telefónica:",
+            "1.4 Correo Institucional, Extensión Telefónica, cell:",
             placeholder="ejemplo@imbabura.gob.ec - Ext. 0000",
         )
 
@@ -153,7 +153,7 @@ if not df_matriz.empty:
                 guardar_datos_nube(reg)
         else:
             st.markdown("---")
-            st.header("Sección 3: Datos Estadísticos")
+            st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
             gen_est = st.radio(
                 "3.1 ¿Genera o posee Datos Estadísticos alfanuméricos?",
                 ["Sí", "No"],
@@ -267,14 +267,15 @@ if not df_matriz.empty:
                 "6.4 Destinatarios de la Información (si aplica):",
                 [
                     "Otras Direcciones GADPI",
-                    "GADs Cantonales / Parroquiales",
+                    "GADs Cantonales", 
+                    "GADs Parroquiales",
                     "Ministerios",
                     "Público en general",
                 ],
             )
 
             st.markdown("---")
-            st.header("Sección 7: Gobernanza y Calidad")
+            st.header("Sección 7: Gobernanza ")
             frec_act = st.selectbox(
                 "7.1 Frecuencia de Actualización:",
                 [
@@ -298,6 +299,7 @@ if not df_matriz.empty:
                     "Software obsoleto",
                     "Equipamiento insuficiente",
                     "Falta normativa",
+                    "Ninguna"
                 ],
             )
             planificacion = st.multiselect(
@@ -318,13 +320,14 @@ if not df_matriz.empty:
                 key="unidad_resp_calculo_unique",
             )
             riesgos_preserv = st.multiselect(
-                "7.7 Identificación de Riesgos de Preservación:",
+                "7.7 Riesgos de Preservación de la Información:",
                 [
                     "Dependencia una persona",
                     "Ausencia respaldos",
                     "Virus/Fallos",
                     "Rotación personal",
                     "Deterioro papel",
+                    "Ninguno",
                 ],
             )
 
