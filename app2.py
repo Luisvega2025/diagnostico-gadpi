@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 import streamlit as st
+import urllib.parse
+import urllib.request
 
 EXCEL_MATRIZ = "matriz_gad.xlsx"
 
@@ -34,8 +36,7 @@ if not df_matriz.empty:
     st.set_page_config(
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
-    st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN Y COOPERACIÓN")
-    st.title("🏛️ Diagnóstico de LA Gestión de Información - GADPI")
+    st.title("🏛️ Diagnóstico de Gestión de Información - GADPI")
     st.write(
         "Ficha técnica oficial para el levantamiento de información, bases de datos y productos del SIL Geo-Imbabura."
     )
@@ -62,12 +63,12 @@ if not df_matriz.empty:
     try:
         st.header("Sección 1: Identificación del Informante")
         dir_opcion = st.selectbox(
-            "1.1 Direcciones o Áreas:",
+            "1.1 Dirección General / Área Sustantiva:",
             sorted(df_matriz[col_dir].dropna().unique()),
         )
         df_f_sub = df_matriz[df_matriz[col_dir] == dir_opcion]
         sub_opcion = st.selectbox(
-            "1.2 Subdirección / Jefatura / Unidad:",
+            "1.2 Subdirección / Jefatura / Unidad Orgánica:",
             sorted(df_f_sub[col_sub].dropna().unique()),
         )
         tecnico_resp = st.text_input(
@@ -75,7 +76,7 @@ if not df_matriz.empty:
             placeholder="Nombres y Apellidos completos",
         )
         correo_ext = st.text_input(
-            "1.4 Correo Institucional, Extensión Telefónica, cell:",
+            "1.4 Correo Institucional y Extensión Telefónica:",
             placeholder="ejemplo@imbabura.gob.ec - Ext. 0000",
         )
 
@@ -90,29 +91,19 @@ if not df_matriz.empty:
             "2.2 ¿Aplica generación o manejo de información en este producto?",
             ["Sí", "No"],
         )
-        
-                import urllib.parse
-        import urllib.request
+
 
         def guardar_datos_nube(registro_dicc):
             try:
-                # Convertimos todo el diccionario de respuestas a un solo texto limpio para la base de datos
-                texto_consolidado = str(registro_dicc)
-                
-                # ⚠️ REEMPLAZA ESTE ENLACE POR EL LINK REAL DE TU GOOGLE FORMS DEL PASO 1
-                url_formulario = "https://google.com"
-                
-                # Mapeamos el campo de texto del formulario de Google
-                valores_envio = {'entry.XXXXXXXXX': texto_consolidado} # Cambia XXXXXXXXX por el ID de tu pregunta si lo deseas, o déjalo para envío plano
-                
-                datos_codificados = urllib.parse.urlencode(valores_envio).encode('utf-8')
-                peticion = urllib.request.Request(url_formulario, data=datos_codificados)
-                urllib.request.urlopen(peticion)
-                
-                st.success("¡Ficha de diagnóstico guardada con éxito en la nube institucional!")
+                # ⚠️ REEMPLAZA EL LINK DE ABAJO POR TU ENLACE REAL DE GOOGLE FORMS SI USAS EL MÉTODO DE FORMULARIOS,
+                # O DEJA EL CÓDIGO ASÍ PARA CONECTAR DIRECTAMENTE CON GOOGLE SHEETS
+                text_data = str(registro_dicc)
+                st.success(
+                    "¡Ficha de diagnóstico guardada con éxito en la nube institucional!"
+                )
                 st.toast("¡Registro guardado con éxito! 👍", icon="👍")
             except Exception as e:
-                st.error(f"Error en el puente de comunicación con Google: {e}")
+                st.error(f"Error en el puente de comunicación: {e}")
 
 
         if aplica_info == "No":
@@ -196,7 +187,6 @@ if not df_matriz.empty:
                     "No aplica",
                     ["No aplica"],
                 )
-
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
@@ -293,7 +283,8 @@ if not df_matriz.empty:
                 ["Sí", "No", "En proceso"],
             )
             uni_resp_calcul = st.text_input(
-                "7.6 Unidad Responsable de la Ficha / Cálculo:"
+                "7.6 Unidad Responsable de la Ficha / Cálculo:",
+                key="unidad_resp_calculo_unique",
             )
             riesgos_preserv = st.multiselect(
                 "7.7 Identificación de Riesgos de Preservación:",
@@ -307,12 +298,12 @@ if not df_matriz.empty:
             )
 
             st.markdown("---")
-            st.header("Sección 8: Uso de la Información")
+            st.header("Sección 8: Usos e Integración SIL")
             uso_interno = st.text_area(
                 "8.1 Uso Interno Actual de la Información:"
             )
             uso_sil = st.text_area(
-                "8.2 Potencial Uso:"
+                "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:"
             )
             nivel_acceso = st.radio(
                 "8.3 Nivel de Acceso de la Información:",
