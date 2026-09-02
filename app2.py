@@ -45,6 +45,25 @@ if not df_matriz.empty:
     st.info(
         "✉️ **¿Preguntas o información adicional?** lvega@imbabura.gob.ec"
     )
+    st.markdown("---")
+    # 🔐 SECCIÓN PRIVADA DE ADMINISTRACIÓN PARA LUIS VEGA
+    with st.sidebar:
+        st.subheader("🔑 Acceso Administrador SIL")
+        clave_admin = st.text_input("Ingrese la clave para descargar la base de datos:", type="password")
+    
+    # Reemplaza "gadpi2026" por la contraseña que tú prefieras usar
+    if clave_admin == "gadpi2026":
+        st.sidebar.success("Acceso Autorizado 👍")
+        if os.path.exists(EXCEL_DIAGNOSTICO):
+            with open(EXCEL_DIAGNOSTICO, "rb") as file:
+                st.sidebar.download_button(
+                    label="📥 Descargar Excel Consolidado",
+                    data=file,
+                    file_name="diagnostico_sil_gadpi_2026.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+        else:
+            st.sidebar.info("La base de datos se está inicializando en el servidor.")
 
     st.markdown("---")
 
