@@ -42,7 +42,7 @@ if not df_matriz.empty:
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
 
-    # 🛠️ SOLUCIÓN PROBLEMA 3: Control de estados para vaciar campos tras guardar
+    # SOLUCIÓN PROBLEMA 3: Control de estados para vaciar campos tras guardar
     if "contador_guardado" not in st.session_state:
         st.session_state.contador_guardado = 0
 
@@ -125,7 +125,7 @@ if not df_matriz.empty:
             sorted(df_f_prod[col_prod].dropna().unique()),
         )
 
-        # ℹ️ SOLUCIÓN NUMERAL 2: Alerta Informativa Dinámica por consulta CSV ultraliviana
+        # Alerta Informativa Dinámica por consulta CSV ultraliviana (Numeral 2)
         try:
             url_csv = f"https://google.com{SHEET_ID}/export?format=csv"
             df_check = pd.read_csv(url_csv)
@@ -143,22 +143,24 @@ if not df_matriz.empty:
         except:
             pass
 
-        # 📝 SOLUCIÓN NUMERAL 1: Campo de Identificación del Insumo o Sub-componente
+        # CORREGIDO AQUÍ: Ahora es la pregunta 2.2 de forma limpia y exacta
         insumo_id = st.text_input(
             "2.2 Nombre / Identificador del Insumo o Sub-componente:",
             placeholder="Ejemplo: Capa GIS de Vías, Censo de Usuarios 2025, Matriz de Indicadores POA",
             key=f"insumo_{st.session_state.contador_guardado}",
         )
 
+        st.markdown("---")
+        st.header("Sección 3: Aplicabilidad de la Información")
         aplica_info = st.radio(
-            "2.3 ¿Aplica generación o manejo de información en este producto?",
+            "3.1 ¿Aplica generación o manejo de información en este producto?",
             ["Sí", "No"],
         )
 
 
         def guardar_datos_nube(registro_dicc):
             try:
-                # 🚀 SOLUCIÓN PROBLEMA 1 Y 2: Guardado permanente libre de concurrencia mediante API de Google
+                # Guardado permanente atómico libre de concurrencia mediante API de Google
                 url_insercion = f"https://google.com{SHEET_ID}/values/A1:append?valueInputOption=USER_ENTERED"
                 df_nuevo = pd.DataFrame([registro_dicc])
                 valores = df_nuevo.values.tolist()
@@ -166,7 +168,7 @@ if not df_matriz.empty:
 
                 st.session_state.contador_guardado += 1
                 st.success(
-                    "¡Ficha de diagnóstico guardada de forma persistente en la nube del SIL!"
+                    "¡Ficha de diagnóstico guardada de forma persistentemente en la nube del SIL!"
                 )
                 st.toast("¡Registro guardado con éxito! 👍", icon="👍")
                 st.rerun()
@@ -206,14 +208,14 @@ if not df_matriz.empty:
                 guardar_datos_nube(reg)
         else:
             st.markdown("---")
-            st.header("Sección 3: Datos Estadísticos")
+            st.header("Sección 4: Datos Estadísticos")
             gen_est = st.radio(
-                "3.1 ¿Genera o posee Datos Estadísticos alfanuméricos?",
+                "4.1 ¿Genera o posee Datos Estadísticos alfanuméricos?",
                 ["Sí", "No"],
             )
             if gen_est == "Sí":
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación Estadística:",
+                    "4.2 Nivel de Desagregación Estadística:",
                     [
                         "Provincial",
                         "Cantonal",
@@ -223,7 +225,7 @@ if not df_matriz.empty:
                     ],
                 )
                 cobertura_est = st.text_input(
-                    "3.3 Cobertura Temporal de Datos Estadísticos:",
+                    "4.3 Cobertura Temporal de Datos Estadísticos:",
                     placeholder="Ejemplo: 2018 - 2026",
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
@@ -231,14 +233,14 @@ if not df_matriz.empty:
                 desag_est, cobertura_est = ["No aplica"], "No aplica"
 
             st.markdown("---")
-            st.header("Sección 4: Datos Geográficos (GIS)")
+            st.header("Sección 5: Datos Geográficos (GIS)")
             gen_gis = st.radio(
-                "4.1 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?",
+                "5.1 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?",
                 ["Sí", "No"],
             )
             if gen_gis == "Sí":
                 desag_gis = st.multiselect(
-                    "4.2 Nivel de Desagregación Geográfica:",
+                    "5.2 Nivel de Desagregación Geográfica:",
                     [
                         "Provincial",
                         "Cantonal",
@@ -248,16 +250,16 @@ if not df_matriz.empty:
                     ],
                 )
                 anio_gis = st.text_input(
-                    "4.3 Año de Datos Geográficos:",
+                    "5.3 Año de Datos Geográficos:",
                     placeholder="Ejemplo: 2020 - 2026",
                     key=f"aniogis_{st.session_state.contador_guardado}",
                 )
                 escala_gis = st.selectbox(
-                    "4.4 Escala de Captura / Levantamiento GIS:",
+                    "5.4 Escala de Captura / Levantamiento GIS:",
                     ["1:5.000", "1:25.000", "1:50.000", "1:100.000", "No"],
                 )
                 formato_gis = st.multiselect(
-                    "4.5 Formato de Datos Geográficos Disponibles:",
+                    "5.5 Formato de Datos Geográficos Disponibles:",
                     [
                         "File Geodatabase (.gdb)",
                         "Shapefile (.shp)",
@@ -274,9 +276,9 @@ if not df_matriz.empty:
                     ["No aplica"],
                 )
             st.markdown("---")
-            st.header("Sección 5: Fuentes y Origen del Dato")
+            st.header("Sección 6: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
-                "5.1 Unidad de Medida del Dato / Indicador:",
+                "6.1 Unidad de Medida del Dato / Indicador:",
                 [
                     "Kilómetros",
                     "Hectáreas",
@@ -287,28 +289,28 @@ if not df_matriz.empty:
                 ],
             )
             fuente_origen = st.selectbox(
-                "5.2 Fuente de Origen del Dato:",
+                "6.2 Fuente de Origen del Dato:",
                 ["Interno GADPI", "Entidad Externa", "Mixto"],
             )
             nombre_fuente = st.text_input(
-                "5.3 Nombre del sistema, censo, catastro o plataforma:",
+                "6.3 Nombre del sistema, censo, catastro o plataforma:",
                 key=f"fuente_{st.session_state.contador_guardado}",
             )
             unidad_prov = st.text_input(
-                "5.4 Unidad / Dirección Interna Proveedora (si aplica):",
+                "6.4 Unidad / Dirección Interna Proveedora (si aplica):",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"unidadprov_{st.session_state.contador_guardado}",
             )
             inst_ext_prov = st.text_input(
-                "5.5 Institución Externa Proveedora (si aplica):",
+                "6.5 Institución Externa Proveedora (si aplica):",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"instext_{st.session_state.contador_guardado}",
             )
 
             st.markdown("---")
-            st.header("Sección 6: Medios de Verificación y Flujos")
+            st.header("Sección 7: Medios de Verificación y Flujos")
             medio_verif = st.multiselect(
-                "6.1 Medio de Verificación Disponible:",
+                "7.1 Medio de Verificación Disponible:",
                 [
                     "Físico (Archivo)",
                     "Digital (Servidor/PC)",
@@ -317,16 +319,16 @@ if not df_matriz.empty:
                 ],
             )
             ruta_archivo = st.text_input(
-                "6.2 Nombre de archivo, BD o Enlace del medio de verificación:",
+                "7.2 Nombre de archivo, BD o Enlace del medio de verificación:",
                 placeholder="Ruta de red, enlace a Google Drive o repositorio",
                 key=f"ruta_{st.session_state.contador_guardado}",
             )
             difunde_terceros = st.radio(
-                "6.3 ¿Entrega o difunde este producto a terceros?",
+                "7.3 ¿Entrega o difunde este producto a terceros?",
                 ["Sí", "No"],
             )
             destinatarios = st.multiselect(
-                "6.4 Destinatarios de la Información (si aplica):",
+                "7.4 Destinatarios de la Información (si aplica):",
                 [
                     "Otras Direcciones GADPI",
                     "GADs Cantonales / Parroquiales",
@@ -336,9 +338,9 @@ if not df_matriz.empty:
             )
 
             st.markdown("---")
-            st.header("Sección 7: Gobernanza y Calidad")
+            st.header("Sección 8: Gobernanza y Calidad")
             frec_act = st.selectbox(
-                "7.1 Frecuencia de Actualización:",
+                "8.1 Frecuencia de Actualización:",
                 [
                     "Continuo",
                     "Mensual",
@@ -350,12 +352,12 @@ if not df_matriz.empty:
                 ],
             )
             fecha_ultima = st.text_input(
-                "7.2 Fecha de Última Actualización de la información (AAAA/MM):",
+                "8.2 Fecha de Última Actualización de la información (AAAA/MM):",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"fechaultima_{st.session_state.contador_guardado}",
             )
             limitaciones = st.multiselect(
-                "7.3 Principales Limitaciones para la Actualización:",
+                "8.3 Principales Limitaciones para la Actualización:",
                 [
                     "Falta personal técnico",
                     "Restricciones presupuestarias",
@@ -365,7 +367,7 @@ if not df_matriz.empty:
                 ],
             )
             planificacion = st.multiselect(
-                "7.4 Alineación Marco de Planificación:",
+                "8.4 Alineación Marco de Planificación:",
                 [
                     "PDOT Imbabura",
                     "POA Institucional",
@@ -374,16 +376,16 @@ if not df_matriz.empty:
                 ],
             )
             ficha_met = st.radio(
-                "7.5 ¿Cuenta con Ficha Metodológica Formalizada?",
+                "8.5 ¿Cuenta con Ficha Metodológica Formalizada?",
                 ["Sí", "No", "En proceso"],
             )
             uni_resp_calcul = st.text_input(
-                "7.6 Unidad Responsable de la Ficha / Cálculo:",
+                "8.6 Unidad Responsable de la Ficha / Cálculo:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
-                key="unidad_resp_calculo_unique",
+                key=f"unidadresp_{st.session_state.contador_guardado}",
             )
             riesgos_preserv = st.multiselect(
-                "7.7 Identificación de Riesgos de Preservación:",
+                "8.7 Identificación de Riesgos de Preservación:",
                 [
                     "Dependencia una persona",
                     "Ausencia respaldos",
@@ -394,23 +396,23 @@ if not df_matriz.empty:
             )
 
             st.markdown("---")
-            st.header("Sección 8: Usos e Integración SIL")
+            st.header("Sección 9: Usos e Integración SIL")
             uso_interno = st.text_area(
-                "8.1 Uso Interno Actual de la Información:",
+                "9.1 Uso Interno Actual de la Información:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"usoint_{st.session_state.contador_guardado}",
             )
             uso_sil = st.text_area(
-                "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:",
+                "9.2 Potencial Uso / Integración en SIL GEO-IMBABURA:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"usosil_{st.session_state.contador_guardado}",
             )
             nivel_acceso = st.radio(
-                "8.3 Nivel de Acceso de la Información:",
+                "9.3 Nivel de Acceso de la Información:",
                 ["Público", "Restringido", "Uso Interno únicamente"],
             )
             url_publicacion = st.text_input(
-                "8.4 Plataforma / Enlace Web de Publicación (si aplica):",
+                "9.4 Plataforma / Enlace Web de Publicación (si aplica):",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"urlpub_{st.session_state.contador_guardado}",
             )
@@ -456,9 +458,7 @@ if not df_matriz.empty:
                         "Riesgos Preservacion": ", ".join(riesgos_preserv),
                         "Uso Interno": uso_interno,
                         "Integracion SIL": uso_sil,
-                        "Nivel Acceso": level_acceso
-                        if "level_acceso" in locals()
-                        else nivel_acceso,
+                        "Nivel Acceso": nivel_acceso,
                         "URL Publicacion": url_publicacion,
                         "Fecha de Registro": pd.Timestamp.now().strftime(
                             "%Y/%m/%d"
