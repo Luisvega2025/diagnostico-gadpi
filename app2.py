@@ -121,24 +121,7 @@ if not df_matriz.empty:
             sorted(df_f_prod[col_prod].dropna().unique()),
         )
 
-        try:
-            from streamlit_gsheets import GSheetsConnection
-
-            conn = st.connection("gsheets", type=GSheetsConnection)
-            # Lectura preliminar para validar duplicados dinámicos (Solución Numeral 2)
-            df_nube_check = conn.read(ttl=0)
-            if not df_nube_check.empty and "Producto" in df_nube_check.columns:
-                existe_registro = (
-                    df_nube_check["Producto"] == prod_opcion
-                ).any()
-                if existe_registro:
-                    st.info(
-                        "ℹ️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
-                    )
-        except:
-            pass
-
-        # 🆕 Numeral 1: Adición del Identificador del Insumo en Sección 2
+        # Numeral 1: Adición del Identificador del Insumo en Sección 2
         insumo_id = st.text_input(
             "2.2 Nombre / Identificador del Insumo o Sub-componente:",
             placeholder="Ejemplo: Capa GIS de Vías, Censo de Usuarios 2025, Matriz de Indicadores POA",
@@ -150,10 +133,32 @@ if not df_matriz.empty:
             ["Sí", "No"],
         )
 
+        try:
+            from streamlit_gsheets import GSheetsConnection
+
+            conn = st.connection("gsheets", type=GSheetsConnection)
+        except:
+            pass
+
 
         def guardar_datos_nube(registro_dicc):
             try:
+                # 🚀 MEJORA INTEGRADA: La consulta en la nube se ejecuta SOLO al presionar guardar para máxima velocidad
                 df_existente = conn.read(ttl=0)
+
+                if (
+                    not df_existente.empty
+                    and "Producto" in df_existente.columns
+                ):
+                    existe_registro = (
+                        df_existente["Producto"] == prod_opcion
+                    ).any()
+                    if existe_registro:
+                        st.toast(
+                            "ℹ️ Adición registrada para producto con historial existente.",
+                            icon="ℹ️",
+                        )
+
                 df_nuevo_registro = pd.DataFrame([registro_dicc])
                 df_consolidado = pd.concat(
                     [df_existente, df_nuevo_registro], ignore_index=True
@@ -232,7 +237,7 @@ if not df_matriz.empty:
                 )
                 anio_gis = st.text_input(
                     "4.3 Año de Datos Geográficos:",
-                    placeholder="Ejemplo: 2020 - 2026",
+                    placeholder="Nombre del sistema, censo, catastro o plataforma",
                     value="" if st.session_state.guardado_exitoso else None,
                 )
                 escala_gis = st.selectbox(
@@ -274,8 +279,7 @@ if not df_matriz.empty:
                 ["Interno GADPI", "Entidad Externa", "Mixto"],
             )
             nombre_fuente = st.text_input(
-                "5.3 Nombre Específico de la Fuente / Proveedor:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                "5.3 Nombre del sistema, censo, catastro o plataforma:",
                 value="" if st.session_state.guardado_exitoso else None,
             )
             unidad_prov = st.text_input(
@@ -335,7 +339,7 @@ if not df_matriz.empty:
             )
             fecha_ultima = st.text_input(
                 "7.2 Fecha de Última Actualización de la información (AAAA/MM):",
-                placeholder="Formato AAAA/MM",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
                 value="" if st.session_state.guardado_exitoso else None,
             )
             limitaciones = st.multiselect(
@@ -349,7 +353,7 @@ if not df_matriz.empty:
                 ],
             )
             planificacion = st.multiselect(
-                "7.4 Alineación Marco de Planificación:",
+                "7.4 Alignment Marco de Planificación:",
                 [
                     "PDOT Imbabura",
                     "POA Institucional",
@@ -363,7 +367,7 @@ if not df_matriz.empty:
             )
             uni_resp_calcul = st.text_input(
                 "7.6 Unidad Responsable de la Ficha / Cálculo:",
-                placeholder="Nombre del departamento o perfil técnico",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key="unidad_resp_calculo_unique",
                 value="" if st.session_state.guardado_exitoso else None,
             )
@@ -379,15 +383,15 @@ if not df_matriz.empty:
             )
 
             st.markdown("---")
-            st.header("Sección 8: Usos de la Información")
+            st.header("Sección 8: Usos e Integración SIL")
             uso_interno = st.text_area(
                 "8.1 Uso Interno Actual de la Información:",
-                placeholder="Mencione quien (unidades) que hacen uso de la información gestionada",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
                 value="" if st.session_state.guardado_exitoso else None,
             )
             uso_sil = st.text_area(
                 "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:",
-                placeholder="Cómo puede aprovecharse en visores GIS o tableros institucionales",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
                 value="" if st.session_state.guardado_exitoso else None,
             )
             nivel_acceso = st.radio(
@@ -396,7 +400,7 @@ if not df_matriz.empty:
             )
             url_publicacion = st.text_input(
                 "8.4 Plataforma / Enlace Web de Publicación (si aplica):",
-                placeholder="URL pública del geoportal o visor web",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
                 value="" if st.session_state.guardado_exitoso else None,
             )
 
