@@ -198,7 +198,7 @@ if not df_matriz.empty:
                 )
                 anio_gis = st.text_input(
                     "4.3 Año de Datos Geográficos:",
-                    placeholder="Nombre del sistema, censo, catastro o plataforma",
+                    placeholder="Ejemplo: 2020 - 2026",
                 )
                 escala_gis = st.selectbox(
                     "4.4 Escala de Captura / Levantamiento GIS:",
@@ -297,7 +297,7 @@ if not df_matriz.empty:
             )
             fecha_ultima = st.text_input(
                 "7.2 Fecha de Última Actualización de la información (AAAA/MM):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Formato AAAA/MM",
             )
             limitaciones = st.multiselect(
                 "7.3 Principales Limitaciones para la Actualización:",
@@ -324,7 +324,7 @@ if not df_matriz.empty:
             )
             uni_resp_calcul = st.text_input(
                 "7.6 Unidad Responsable de la Ficha / Cálculo:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Nombre del departamento o perfil técnico",
                 key="unidad_resp_calculo_unique",
             )
             riesgos_preserv = st.multiselect(
@@ -342,11 +342,11 @@ if not df_matriz.empty:
             st.header("Sección 8: Usos e Integración SIL")
             uso_interno = st.text_area(
                 "8.1 Uso Interno Actual de la Información:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Mencione quien (unidades) que hacen uso de la información gestionada",
             )
             uso_sil = st.text_area(
                 "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Otros usos que puede aprovecharse",
             )
             nivel_acceso = st.radio(
                 "8.3 Nivel de Accesso de la Información:",
@@ -354,7 +354,7 @@ if not df_matriz.empty:
             )
             url_publicacion = st.text_input(
                 "8.4 Plataforma / Enlace Web de Publicación (si aplica):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="URL pública del geoportal o visor web, otros",
             )
 
             st.markdown("---")
