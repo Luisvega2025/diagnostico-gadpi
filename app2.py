@@ -125,7 +125,7 @@ if not df_matriz.empty:
             sorted(df_f_prod[col_prod].dropna().unique()),
         )
 
-        # Alerta Informativa del Numeral 2 (Consulta remota ligera)
+        # ℹ️ ADVERTENCIA AUTOMÁTICA AL USUARIO SI EL PRODUCTO YA SE REPETÍA
         try:
             url_csv = f"https://google.com{SHEET_ID}/export?format=csv"
             df_check = pd.read_csv(url_csv)
@@ -143,23 +143,16 @@ if not df_matriz.empty:
         except:
             pass
 
-        # Numeral 1: Campo de Identificación del Insumo dentro de la Sección 2
-        insumo_id = st.text_input(
-            "2.2 Nombre / Identificador del Insumo o Sub-componente:",
-            placeholder="Ejemplo: Capa GIS de Vías, Censo de Usuarios 2025, Matriz de Indicadores POA",
-            key=f"insumo_{st.session_state.contador_guardado}",
-        )
-
-        # Pregunta nativa de aplicabilidad mantenida en su lugar correcto de la Sección 2
+        # PREGUNTA 2.2 ORIGINAL DE APLICABILIDAD DE INFORMACIÓN
         aplica_info = st.radio(
-            "2.3 ¿Aplica generación o manejo de información en este producto?",
+            "2.2 ¿Aplica generación o manejo de información en este producto?",
             ["Sí", "No"],
         )
 
 
         def guardar_datos_nube(registro_dicc):
             try:
-                # Guardado persistente atómico libre de concurrencia directa a Google Sheets
+                # Guardado de alta concurrencia directo a la API de tu Google Sheets
                 url_insercion = f"https://google.com{SHEET_ID}/values/A1:append?valueInputOption=USER_ENTERED"
                 df_nuevo = pd.DataFrame([registro_dicc])
                 valores = df_nuevo.values.tolist()
@@ -198,7 +191,6 @@ if not df_matriz.empty:
                     "Tecnico": tecnico_resp,
                     "Contacto": correo_ext,
                     "Producto": prod_opcion,
-                    "Insumo / Sub-componente": insumo_id,
                     "Aplica Info": "No",
                     "Fecha de Registro": pd.Timestamp.now().strftime(
                         "%Y/%m/%d"
@@ -381,7 +373,7 @@ if not df_matriz.empty:
             uni_resp_calcul = st.text_input(
                 "7.6 Unidad Responsable de la Ficha / Cálculo:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
-                key=f"unidadresp_{st.session_state.contador_guardado}",
+                key="unidad_resp_calculo_unique",
             )
             riesgos_preserv = st.multiselect(
                 "7.7 Identificación de Riesgos de Preservación:",
@@ -429,7 +421,6 @@ if not df_matriz.empty:
                         "Tecnico": tecnico_resp,
                         "Contacto": correo_ext,
                         "Producto": prod_opcion,
-                        "Insumo / Sub-componente": insumo_id,
                         "Aplica Info": aplica_info,
                         "Datos Estadisticos": gen_est,
                         "Desagregacion Est": ", ".join(desag_est),
