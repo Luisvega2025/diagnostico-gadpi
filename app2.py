@@ -4,7 +4,7 @@ import streamlit as st
 import urllib.parse
 import urllib.request
 
-# DEFINICIÓN DE ARCHIVOS AL INICIO PARA EVITAR ERRORES
+# DEFINICIÓN DE ARCHIVOS AL INICIO
 EXCEL_MATRIZ = "matriz_gad.xlsx"
 EXCEL_DIAGNOSTICO = "diagnostico_sil_gadpi_2026.xlsx"
 
@@ -38,21 +38,23 @@ if not df_matriz.empty:
     st.set_page_config(
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
-    st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN Y COOPERACIÓN")
-    st.title("🏛️ Diagnóstico de Gestión de Información")
+    st.title("🏛️ Diagnóstico de Gestión de Información - GADPI")
     st.write(
-        "Ficha técnica para el levantamiento de información."
+        "Ficha técnica oficial para el levantamiento de información, bases de datos y productos del SIL Geo-Imbabura."
     )
     st.info(
         "✉️ **¿Preguntas o información adicional?** lvega@imbabura.gob.ec"
     )
+
     st.markdown("---")
-    # 🔐 SECCIÓN PRIVADA DE ADMINISTRACIÓN PARA LUIS VEGA
+
+    # 🔐 SECCIÓN PRIVADA DE ADMINISTRACIÓN CON CONTRASEÑA
     with st.sidebar:
         st.subheader("🔑 Acceso Administrador SIL")
-        clave_admin = st.text_input("Ingrese la clave para descargar la base de datos:", type="password")
-    
-    # Reemplaza "gadpi2026" por la contraseña que tú prefieras usar
+        clave_admin = st.text_input(
+            "Ingrese la clave para descargar la base de datos:", type="password"
+        )
+
     if clave_admin == "gadpi2026":
         st.sidebar.success("Acceso Autorizado 👍")
         if os.path.exists(EXCEL_DIAGNOSTICO):
@@ -61,12 +63,12 @@ if not df_matriz.empty:
                     label="📥 Descargar Excel Consolidado",
                     data=file,
                     file_name="diagnostico_sil_gadpi_2026.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 )
         else:
-            st.sidebar.info("La base de datos se está inicializando en el servidor.")
-
-    st.markdown("---")
+            st.sidebar.info(
+                "La base de datos se está inicializando en el servidor."
+            )
 
     columnas = list(df_matriz.columns)
     col_dir = next((c for c in columnas if "dir" in c.lower()), "Direccion")
@@ -86,20 +88,20 @@ if not df_matriz.empty:
     try:
         st.header("Sección 1: Identificación del Informante")
         dir_opcion = st.selectbox(
-            "1.1 Direcciones:",
+            "1.1 Dirección General / Área Sustantiva:",
             sorted(df_matriz[col_dir].dropna().unique()),
         )
         df_f_sub = df_matriz[df_matriz[col_dir] == dir_opcion]
         sub_opcion = st.selectbox(
-            "1.2 Subdirección / Jefatura / Unidad:",
+            "1.2 Subdirección / Jefatura / Unidad Orgánica:",
             sorted(df_f_sub[col_sub].dropna().unique()),
         )
         tecnico_resp = st.text_input(
-            "1.3 Nombre del Técnico Responsable del llenado:",
+            "1.3 Nombre del Técnico Responsable del Llenado:",
             placeholder="Nombres y Apellidos completos",
         )
         correo_ext = st.text_input(
-            "1.4 Correo Institucional, Extensión Telefónica, cell:",
+            "1.4 Correo Institucional y Extensión Telefónica:",
             placeholder="ejemplo@imbabura.gob.ec - Ext. 0000",
         )
 
@@ -153,7 +155,7 @@ if not df_matriz.empty:
                 guardar_datos_nube(reg)
         else:
             st.markdown("---")
-            st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
+            st.header("Sección 3: Datos Estadísticos")
             gen_est = st.radio(
                 "3.1 ¿Genera o posee Datos Estadísticos alfanuméricos?",
                 ["Sí", "No"],
@@ -256,10 +258,11 @@ if not df_matriz.empty:
                     "Sistema Web",
                 ],
             )
+            # CORRECCIÓN EXACTA DE LA LÍNEA 261 AQUÍ (placeholder en inglés)
             ruta_archivo = st.text_input(
                 "6.2 Nombre de archivo, BD o Enlace del medio de verificación:",
-                marcador de posicion="Ruta de red, enlace a Google Drive o repositorio",
-            ),
+                placeholder="Ruta de red, enlace a Google Drive o repositorio",
+            )
             difunde_terceros = st.radio(
                 "6.3 ¿Entrega o difunde este producto a terceros?",
                 ["Sí", "No"],
@@ -268,15 +271,14 @@ if not df_matriz.empty:
                 "6.4 Destinatarios de la Información (si aplica):",
                 [
                     "Otras Direcciones GADPI",
-                    "GADs Cantonales", 
-                    "GADs Parroquiales",
+                    "GADs Cantonales / Parroquiales",
                     "Ministerios",
                     "Público en general",
                 ],
             )
 
             st.markdown("---")
-            st.header("Sección 7: Gobernanza ")
+            st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
                 "7.1 Frecuencia de Actualización:",
                 [
@@ -300,7 +302,6 @@ if not df_matriz.empty:
                     "Software obsoleto",
                     "Equipamiento insuficiente",
                     "Falta normativa",
-                    "Ninguna"
                 ],
             )
             planificacion = st.multiselect(
@@ -321,21 +322,20 @@ if not df_matriz.empty:
                 key="unidad_resp_calculo_unique",
             )
             riesgos_preserv = st.multiselect(
-                "7.7 Riesgos de Preservación de la Información:",
+                "7.7 Identificación de Riesgos de Preservación:",
                 [
                     "Dependencia una persona",
                     "Ausencia respaldos",
                     "Virus/Fallos",
                     "Rotación personal",
                     "Deterioro papel",
-                    "Ninguno",
                 ],
             )
 
             st.markdown("---")
-            st.header("Sección 8: Usos de la Información")
+            st.header("Sección 8: Usos e Integración SIL")
             uso_interno = st.text_area(
-                "8.1 ¿Cual es el uso Interno Actual de la Información que generan?:"
+                "8.1 Uso Interno Actual de la Información:"
             )
             uso_sil = st.text_area(
                 "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:"
@@ -370,10 +370,8 @@ if not df_matriz.empty:
                         "Anio GIS": anio_gis,
                         "Escala GIS": escala_gis,
                         "Formato GIS": ", ".join(formato_gis),
-                        "Unidad Medida": unity_medida
-                        if "unity_medida" in locals()
-                        else unidad_medida,
-                        "Fuente Origin": fuente_origen,
+                        "Unidad Medida": unidad_medida,
+                        "Fuente Origen": fuente_origen,
                         "Nombre Fuente": nombre_fuente,
                         "Unidad Prov": unidad_prov,
                         "Inst Ext Prov": inst_ext_prov,
