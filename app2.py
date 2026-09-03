@@ -36,7 +36,7 @@ if not df_matriz.empty:
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
 
-    # Lógica de estados para vaciar los text_input tras un guardado exitoso
+    # Control de estados para vaciar los campos tras un guardado exitoso
     if "guardado_exitoso" not in st.session_state:
         st.session_state.guardado_exitoso = False
 
@@ -120,17 +120,35 @@ if not df_matriz.empty:
             "2.1 Seleccione el Producto Institucional del Estatuto Orgánico:",
             sorted(df_f_prod[col_prod].dropna().unique()),
         )
-        aplica_info = st.radio(
-            "2.2 ¿Aplica generación o manejo de información en este producto?",
-            ["Sí", "No"],
-        )
 
         try:
             from streamlit_gsheets import GSheetsConnection
 
             conn = st.connection("gsheets", type=GSheetsConnection)
+            # Lectura preliminar para validar duplicados dinámicos (Solución Numeral 2)
+            df_nube_check = conn.read(ttl=0)
+            if not df_nube_check.empty and "Producto" in df_nube_check.columns:
+                existe_registro = (
+                    df_nube_check["Producto"] == prod_opcion
+                ).any()
+                if existe_registro:
+                    st.info(
+                        "ℹ️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
+                    )
         except:
             pass
+
+        # 🆕 Numeral 1: Adición del Identificador del Insumo en Sección 2
+        insumo_id = st.text_input(
+            "2.2 Nombre / Identificador del Insumo o Sub-componente:",
+            placeholder="Ejemplo: Capa GIS de Vías, Censo de Usuarios 2025, Matriz de Indicadores POA",
+            value="" if st.session_state.guardado_exitoso else None,
+        )
+
+        aplica_info = st.radio(
+            "2.3 ¿Aplica generación o manejo de información en este producto?",
+            ["Sí", "No"],
+        )
 
 
         def guardar_datos_nube(registro_dicc):
@@ -164,6 +182,7 @@ if not df_matriz.empty:
                     "Tecnico": tecnico_resp,
                     "Contacto": correo_ext,
                     "Producto": prod_opcion,
+                    "Insumo / Sub-componente": insumo_id,
                     "Aplica Info": "No",
                 }
                 guardar_datos_nube(reg)
@@ -394,6 +413,7 @@ if not df_matriz.empty:
                         "Tecnico": tecnico_resp,
                         "Contacto": correo_ext,
                         "Producto": prod_opcion,
+                        "Insumo / Sub-componente": insumo_id,
                         "Aplica Info": aplica_info,
                         "Datos Estadisticos": gen_est,
                         "Desagregacion Est": ", ".join(desag_est),
