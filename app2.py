@@ -1,12 +1,9 @@
 import os
 import pandas as pd
 import streamlit as st
-import urllib.parse
-import urllib.request
 
 # DEFINICIÓN DE ARCHIVOS AL INICIO
 EXCEL_MATRIZ = "matriz_gad.xlsx"
-EXCEL_DIAGNOSTICO = "diagnostico_sil_gadpi_2026.xlsx"
 
 
 @st.cache_data
@@ -38,6 +35,11 @@ if not df_matriz.empty:
     st.set_page_config(
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
+
+    # Lógica de estados para vaciar los text_input tras un guardado exitoso
+    if "guardado_exitoso" not in st.session_state:
+        st.session_state.guardado_exitoso = False
+
     st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN Y COOPERACIÓN")
     st.title("🏛️ Diagnóstico de Gestión de Información - GADPI")
     st.write(
@@ -58,17 +60,20 @@ if not df_matriz.empty:
 
     if clave_admin == "gadpi2026":
         st.sidebar.success("Acceso Autorizado 👍")
-        if os.path.exists(EXCEL_DIAGNOSTICO):
-            with open(EXCEL_DIAGNOSTICO, "rb") as file:
-                st.sidebar.download_button(
-                    label="📥 Descargar Excel Consolidado",
-                    data=file,
-                    file_name="diagnostico_sil_gadpi_2026.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                )
-        else:
+        try:
+            from streamlit_gsheets import GSheetsConnection
+
+            conn_admin = st.connection("gsheets", type=GSheetsConnection)
+            df_descarga = conn_admin.read(ttl=0)
+            st.sidebar.download_button(
+                label="📥 Descargar Excel Consolidado",
+                data=df_descarga.to_excel(index=False),
+                file_name="diagnostico_sil_gadpi_2026.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+        except Exception as e:
             st.sidebar.info(
-                "La base de datos se está inicializando en el servidor."
+                "Conectando con el repositorio remoto permanente..."
             )
 
     columnas = list(df_matriz.columns)
@@ -100,10 +105,12 @@ if not df_matriz.empty:
         tecnico_resp = st.text_input(
             "1.3 Nombre del Técnico Responsable del Llenado:",
             placeholder="Nombres y Apellidos completos",
+            value="" if st.session_state.guardado_exitoso else None,
         )
         correo_ext = st.text_input(
             "1.4 Correo Institucional y Extensión Telefónica:",
             placeholder="ejemplo@imbabura.gob.ec - Ext. 0000",
+            value="" if st.session_state.guardado_exitoso else None,
         )
 
         st.markdown("---")
@@ -118,25 +125,31 @@ if not df_matriz.empty:
             ["Sí", "No"],
         )
 
+        try:
+            from streamlit_gsheets import GSheetsConnection
+
+            conn = st.connection("gsheets", type=GSheetsConnection)
+        except:
+            pass
+
 
         def guardar_datos_nube(registro_dicc):
             try:
-                df_nuevo = pd.DataFrame([registro_dicc])
-                if os.path.exists(EXCEL_DIAGNOSTICO):
-                    df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
-                    df_final = pd.concat(
-                        [df_existente, df_nuevo], ignore_index=True
-                    )
-                else:
-                    df_final = df_nuevo
-                df_final.to_excel(EXCEL_DIAGNOSTICO, index=False)
+                df_existente = conn.read(ttl=0)
+                df_nuevo_registro = pd.DataFrame([registro_dicc])
+                df_consolidado = pd.concat(
+                    [df_existente, df_nuevo_registro], ignore_index=True
+                )
+                conn.update(data=df_consolidado)
+                st.session_state.guardado_exitoso = True
                 st.success(
-                    "¡Ficha de diagnóstico guardada con éxito en el servidor central!"
+                    "¡Ficha de diagnóstico guardada de forma persistente en la nube institucional!"
                 )
                 st.toast("¡Registro guardado con éxito! 👍", icon="👍")
+                st.rerun()
             except Exception as e:
                 st.error(
-                    f"Error al escribir en la base de datos del servidor: {e}"
+                    f"Error de persistencia distribuidora en Google Sheets: {e}"
                 )
 
 
@@ -154,6 +167,7 @@ if not df_matriz.empty:
                     "Aplica Info": "No",
                 }
                 guardar_datos_nube(reg)
+                st.session_state.guardado_exitoso = False
         else:
             st.markdown("---")
             st.header("Sección 3: Datos Estadísticos")
@@ -175,6 +189,7 @@ if not df_matriz.empty:
                 cobertura_est = st.text_input(
                     "3.3 Cobertura Temporal de Datos Estadísticos:",
                     placeholder="Ejemplo: 2018 - 2026",
+                    value="" if st.session_state.guardado_exitoso else None,
                 )
             else:
                 desag_est, cobertura_est = ["No aplica"], "No aplica"
@@ -199,6 +214,7 @@ if not df_matriz.empty:
                 anio_gis = st.text_input(
                     "4.3 Año de Datos Geográficos:",
                     placeholder="Ejemplo: 2020 - 2026",
+                    value="" if st.session_state.guardado_exitoso else None,
                 )
                 escala_gis = st.selectbox(
                     "4.4 Escala de Captura / Levantamiento GIS:",
@@ -238,18 +254,20 @@ if not df_matriz.empty:
                 "5.2 Fuente de Origen del Dato:",
                 ["Interno GADPI", "Entidad Externa", "Mixto"],
             )
-            # 🆕 5.3 Corregido e incorporado con su placeholder estandarizado
             nombre_fuente = st.text_input(
                 "5.3 Nombre Específico de la Fuente / Proveedor:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
+                value="" if st.session_state.guardado_exitoso else None,
             )
             unidad_prov = st.text_input(
                 "5.4 Unidad / Dirección Interna Proveedora (si aplica):",
-                placeholder="Nombre de la unidad interna proveedora",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                value="" if st.session_state.guardado_exitoso else None,
             )
             inst_ext_prov = st.text_input(
                 "5.5 Institución Externa Proveedora (si aplica):",
-                placeholder="Ejemplo: INEC, MAATE, MTOP, MAG, INAMHI",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                value="" if st.session_state.guardado_exitoso else None,
             )
 
             st.markdown("---")
@@ -266,6 +284,7 @@ if not df_matriz.empty:
             ruta_archivo = st.text_input(
                 "6.2 Nombre de archivo, BD o Enlace del medio de verificación:",
                 placeholder="Ruta de red, enlace a Google Drive o repositorio",
+                value="" if st.session_state.guardado_exitoso else None,
             )
             difunde_terceros = st.radio(
                 "6.3 ¿Entrega o difunde este producto a terceros?",
@@ -297,7 +316,8 @@ if not df_matriz.empty:
             )
             fecha_ultima = st.text_input(
                 "7.2 Fecha de Última Actualización de la información (AAAA/MM):",
-                placeholder="Formato AAAA/MM",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                value="" if st.session_state.guardado_exitoso else None,
             )
             limitaciones = st.multiselect(
                 "7.3 Principales Limitaciones para la Actualización:",
@@ -324,8 +344,9 @@ if not df_matriz.empty:
             )
             uni_resp_calcul = st.text_input(
                 "7.6 Unidad Responsable de la Ficha / Cálculo:",
-                placeholder="Nombre del departamento o perfil técnico",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key="unidad_resp_calculo_unique",
+                value="" if st.session_state.guardado_exitoso else None,
             )
             riesgos_preserv = st.multiselect(
                 "7.7 Identificación de Riesgos de Preservación:",
@@ -342,19 +363,22 @@ if not df_matriz.empty:
             st.header("Sección 8: Usos e Integración SIL")
             uso_interno = st.text_area(
                 "8.1 Uso Interno Actual de la Información:",
-                placeholder="Mencione quien (unidades) que hacen uso de la información gestionada",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                value="" if st.session_state.guardado_exitoso else None,
             )
             uso_sil = st.text_area(
                 "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:",
-                placeholder="Otros usos que puede aprovecharse",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                value="" if st.session_state.guardado_exitoso else None,
             )
             nivel_acceso = st.radio(
-                "8.3 Nivel de Accesso de la Información:",
+                "8.3 Nivel de Acceso de la Información:",
                 ["Público", "Restringido", "Uso Interno únicamente"],
             )
             url_publicacion = st.text_input(
                 "8.4 Plataforma / Enlace Web de Publicación (si aplica):",
-                placeholder="URL pública del geoportal o visor web, otros",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                value="" if st.session_state.guardado_exitoso else None,
             )
 
             st.markdown("---")
@@ -404,5 +428,6 @@ if not df_matriz.empty:
                         ),
                     }
                     guardar_datos_nube(reg)
+                    st.session_state.guardado_exitoso = False
     except KeyError as e:
         st.error(f"Error al acoplar las columnas: {columnas}")
