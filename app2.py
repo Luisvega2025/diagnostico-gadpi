@@ -117,8 +117,8 @@ if not df_matriz.empty:
             key=f"tecnico_{st.session_state.contador_guardado}",
         )
         correo_ext = st.text_input(
-            "1.4 Correo Institucional y Extensión Telefónica:",
-            placeholder="ejemplo@imbabura.gob.ec - Ext. 0000",
+            "1.4 Correo Institucional, Extensión Telefónica, cell:",
+            placeholder="ejemplo@imbabura.gob.ec - Ext. 0000 , cell",
             key=f"correo_{st.session_state.contador_guardado}",
         )
         st.markdown("---")
@@ -151,7 +151,7 @@ if not df_matriz.empty:
                 pass
 
         aplica_info = st.radio(
-            "2.2 ¿Aplica generación o manejo de información en este producto?",
+            "2.2 ¿Aplica o generación información para cumplir con este producto?",
             ["Sí", "No"],
         )
 
@@ -201,14 +201,14 @@ if not df_matriz.empty:
                 guardar_datos_nube(reg)
         else:
             st.markdown("---")
-            st.header("Sección 3: Datos Estadísticos")
+            st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
             gen_est = st.radio(
-                "3.1 ¿Genera o posee Datos Estadísticos alfanuméricos?",
+                "3.1 ¿Genera o posee Datos Estadísticos/alfanuméricos?",
                 ["Sí", "No"],
             )
             if gen_est == "Sí":
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación Estadística:",
+                    "3.2 Nivel de Desagregación estadistica:",
                     [
                         "Provincial",
                         "Cantonal",
@@ -218,7 +218,7 @@ if not df_matriz.empty:
                     ],
                 )
                 cobertura_est = st.text_input(
-                    "3.3 Cobertura Temporal de Datos Estadísticos:",
+                    "3.3 Temporalidad de Datos Estadísticos:",
                     placeholder="Ejemplo: 2018 - 2026",
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
@@ -248,7 +248,7 @@ if not df_matriz.empty:
                     key=f"aniogis_{st.session_state.contador_guardado}",
                 )
                 escala_gis = st.selectbox(
-                    "4.4 Escala de Captura / Levantamiento GIS:",
+                    "4.4 Escala de la cartografia:",
                     ["1:5.000", "1:25.000", "1:50.000", "1:100.000", "No"],
                 )
                 formato_gis = st.multiselect(
@@ -286,17 +286,18 @@ if not df_matriz.empty:
                 ["Interno GADPI", "Entidad Externa", "Mixto"],
             )
             nombre_fuente = st.text_input(
-                "5.3 Nombre del sistema, censo, catastro o plataforma:",
+                "5.3 Nombre de la fuente/proveedor:",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"fuente_{st.session_state.contador_guardado}",
             )
             unidad_prov = st.text_input(
                 "5.4 Unidad / Dirección Interna Proveedora (si aplica):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Nombre de la unidad interna proveedora",
                 key=f"unidadprov_{st.session_state.contador_guardado}",
             )
             inst_ext_prov = st.text_input(
                 "5.5 Institución Externa Proveedora (si aplica):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Ejemplo: INEC, MAATE, MTOP, MAG, INAMHI",
                 key=f"instext_{st.session_state.contador_guardado}",
             )
 
@@ -346,7 +347,7 @@ if not df_matriz.empty:
             )
             fecha_ultima = st.text_input(
                 "7.2 Fecha de Última Actualización de la información (AAAA/MM):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="AAAA/MM",
                 key=f"fechaultima_{st.session_state.contador_guardado}",
             )
             limitaciones = st.multiselect(
@@ -374,11 +375,11 @@ if not df_matriz.empty:
             )
             uni_resp_calcul = st.text_input(
                 "7.6 Unidad Responsable de la Ficha / Cálculo:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Nombre del departamento o perfil técnico",
                 key="unidad_resp_calculo_unique",
             )
             riesgos_preserv = st.multiselect(
-                "7.7 Identificación de Riesgos de Preservación:",
+                "7.7 Identificación de Riesgos de Preservación dela Información:",
                 [
                     "Dependencia una persona",
                     "Ausencia respaldos",
@@ -389,15 +390,15 @@ if not df_matriz.empty:
             )
 
             st.markdown("---")
-            st.header("Sección 8: Usos e Integración SIL")
+            st.header("Sección 8: Usos de la Información")
             uso_interno = st.text_area(
                 "8.1 Uso Interno Actual de la Información:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Mencionequien hace uso de la información generada",
                 key=f"usoint_{st.session_state.contador_guardado}",
             )
             uso_sil = st.text_area(
                 "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Como puede aprovecharse la información",
                 key=f"usosil_{st.session_state.contador_guardado}",
             )
             nivel_acceso = st.radio(
@@ -406,7 +407,7 @@ if not df_matriz.empty:
             )
             url_publicacion = st.text_input(
                 "8.4 Plataforma / Enlace Web de Publicación (si aplica):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="URL pública del geoportal o visor web",
                 key=f"urlpub_{st.session_state.contador_guardado}",
             )
 
