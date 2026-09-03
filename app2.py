@@ -1,15 +1,9 @@
 import os
 import pandas as pd
 import streamlit as st
-import requests
-import json
 
-# DEFINICIÓN DE ARCHIVOS Y RUTAS CENTRALES
+# DEFINICIÓN DE ARCHIVOS AL INICIO
 EXCEL_MATRIZ = "matriz_gad.xlsx"
-
-# 🔑 ID DE TU HOJA DE GOOGLE SHEETS REAL EN DRIVE
-# Reemplaza este código largo por el ID real de tu hoja (el texto entre /d/ y /edit en tu link)
-SHEET_ID = "1UfHxL60k-Q3E-5aFD65NitnjBrd6smud8F9BtvN-d0M"
 
 
 @st.cache_data
@@ -67,18 +61,28 @@ if not df_matriz.empty:
     if clave_admin == "gadpi2026":
         st.sidebar.success("Acceso Autorizado 👍")
         try:
-            url_publica = f"https://google.com{SHEET_ID}/export?format=xlsx"
-            df_descarga = pd.read_excel(url_publica)
+            # Conexión nativa de Streamlit utilizando los credenciales guardados en tus Secrets de la nube
+            from streamlit_gsheets import GSheetsConnection
+
+            conn_admin = st.connection("gsheets", type=GSheetsConnection)
+            df_descarga = conn_admin.read(ttl=0)
+
+            # Conversión binaria directa para asegurar la descarga instantánea en Excel sin bucles
+            import io
+
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+                df_descarga.to_excel(writer, index=False)
+            buffer.seek(0)
+
             st.sidebar.download_button(
                 label="📥 Descargar Excel Consolidado",
-                data=df_descarga.to_excel(index=False),
+                data=buffer,
                 file_name="diagnostico_sil_gadpi_2026.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
         except Exception as e:
-            st.sidebar.info(
-                "Conectando con el repositorio remoto permanente..."
-            )
+            st.sidebar.error(f"Error en la conexión con la base de datos: {e}")
 
     columnas = list(df_matriz.columns)
     col_dir = next((c for c in columnas if "dir" in c.lower()), "Direccion")
@@ -125,10 +129,12 @@ if not df_matriz.empty:
             sorted(df_f_prod[col_prod].dropna().unique()),
         )
 
-        # ℹ️ ADVERTENCIA AUTOMÁTICA AL USUARIO SI EL PRODUCTO YA SE REPETÍA
+        # ℹ️ ADVERTENCIA AUTOMÁTICA EN SECCIÓN 2 (Si el producto ya tiene historial)
         try:
-            url_csv = f"https://google.com{SHEET_ID}/export?format=csv"
-            df_check = pd.read_csv(url_csv)
+            from streamlit_gsheets import GSheetsConnection
+
+            conn = st.connection("gsheets", type=GSheetsConnection)
+            df_check = conn.read(ttl=0)
             if not df_check.empty and "Producto" in df_check.columns:
                 if (
                     df_check["Producto"]
@@ -143,7 +149,7 @@ if not df_matriz.empty:
         except:
             pass
 
-        # PREGUNTA 2.2 ORIGINAL DE APLICABILIDAD DE INFORMACIÓN
+        # PREGUNTA 2.2 ORIGINAL METODOLÓGICA DE APLICABILIDAD (Sí/No)
         aplica_info = st.radio(
             "2.2 ¿Aplica generación o manejo de información en este producto?",
             ["Sí", "No"],
@@ -152,32 +158,25 @@ if not df_matriz.empty:
 
         def guardar_datos_nube(registro_dicc):
             try:
-                # Guardado de alta concurrencia directo a la API de tu Google Sheets
-                url_insercion = f"https://google.com{SHEET_ID}/values/A1:append?valueInputOption=USER_ENTERED"
-                df_nuevo = pd.DataFrame([registro_dicc])
-                valores = df_nuevo.values.tolist()
-                requests.post(url_insercion, data=json.dumps({"values": valores}))
+                # Lectura e inserción atómica en la nube para mitigar colisiones por concurrencia
+                df_existente = conn.read(ttl=0)
+                df_nuevo_registro = pd.DataFrame([registro_dicc])
+                df_consolidado = pd.concat(
+                    [df_existente, df_nuevo_registro], ignore_index=True
+                )
+
+                conn.update(data=df_consolidado)
 
                 st.session_state.contador_guardado += 1
                 st.success(
-                    "¡Ficha de diagnóstico guardada de forma persistente en la nube del SIL!"
+                    "¡Ficha de diagnóstico guardada de forma persistente en la nube institucional!"
                 )
                 st.toast("¡Registro guardado con éxito! 👍", icon="👍")
                 st.rerun()
             except Exception as e:
-                df_nuevo = pd.DataFrame([registro_dicc])
-                df_nuevo.to_csv(
-                    "respaldo_emergencia_sil.csv",
-                    mode="a",
-                    header=not os.path.exists("respaldo_emergencia_sil.csv"),
-                    index=False,
+                st.error(
+                    f"Error de comunicación remota con Google Drive: {e}"
                 )
-                st.session_state.contador_guardado += 1
-                st.success(
-                    "¡Ficha guardada de forma segura en el repositorio de respaldo institucional!"
-                )
-                st.toast("¡Registro guardado con éxito! 👍", icon="👍")
-                st.rerun()
 
 
         if aplica_info == "No":
@@ -371,7 +370,7 @@ if not df_matriz.empty:
                 ["Sí", "No", "En proceso"],
             )
             uni_resp_calcul = st.text_input(
-                "7.6 Unidad Responsable de la Ficha / Cálculo:",
+                "7.6 Unidad Responsible de la Ficha / Cálculo:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key="unidad_resp_calculo_unique",
             )
@@ -455,5 +454,6 @@ if not df_matriz.empty:
                         ),
                     }
                     guardar_datos_nube(reg)
+                    st.session_state.guardado_exitoso = False
     except KeyError as e:
         st.error(f"Error al acoplar las columnas: {columnas}")
