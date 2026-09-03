@@ -9,7 +9,7 @@ EXCEL_MATRIZ = "matriz_gad.xlsx"
 
 # 🔑 ID DE TU HOJA DE GOOGLE SHEETS REAL EN DRIVE
 # Reemplaza este código largo por el ID real de tu hoja (el texto entre /d/ y /edit en tu link)
-SHEET_ID = "1gq_O5rC8U2L6r7n_R2E3P_R_Zk_Vb1g7pX9v8w0_REEMPLAZAR"
+SHEET_ID = "1UfHxL60k-Q3E-5aFD65NitnjBrd6smud8F9BtvN-d0M"
 
 
 @st.cache_data
