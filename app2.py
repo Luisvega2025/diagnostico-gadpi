@@ -237,15 +237,15 @@ if not df_matriz.empty:
                 "5.2 Fuente de Origen del Dato:",
                 ["Interno GADPI", "Entidad Externa", "Mixto"],
             )
+            # 🆕 5.3 Corregido e incorporado con su placeholder estandarizado
             nombre_fuente = st.text_input(
-                "5.3 Nombre del sistema, censo, catastro o plataforma:"
+                "5.3 Nombre Específico de la Fuente / Proveedor:",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
             )
-            # 🆕 5.4 Actualizado con placeholder explicativo
             unidad_prov = st.text_input(
                 "5.4 Unidad / Dirección Interna Proveedora (si aplica):",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
             )
-            # 🆕 5.5 Actualizado con placeholder explicativo
             inst_ext_prov = st.text_input(
                 "5.5 Institución Externa Proveedora (si aplica):",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
@@ -294,7 +294,6 @@ if not df_matriz.empty:
                     "No se actualizan",
                 ],
             )
-            # 🆕 7.2 Actualizado con placeholder explicativo
             fecha_ultima = st.text_input(
                 "7.2 Fecha de Última Actualización de la información (AAAA/MM):",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
@@ -322,7 +321,6 @@ if not df_matriz.empty:
                 "7.5 ¿Cuenta con Ficha Metodológica Formalizada?",
                 ["Sí", "No", "En proceso"],
             )
-            # 🆕 7.6 Actualizado con placeholder explicativo
             uni_resp_calcul = st.text_input(
                 "7.6 Unidad Responsable de la Ficha / Cálculo:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
@@ -341,21 +339,18 @@ if not df_matriz.empty:
 
             st.markdown("---")
             st.header("Sección 8: Usos e Integración SIL")
-            # 🆕 8.1 Actualizado con placeholder explicativo
             uso_interno = st.text_area(
                 "8.1 Uso Interno Actual de la Información:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
             )
-            # 🆕 8.2 Actualizado con placeholder explicativo
             uso_sil = st.text_area(
                 "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
             )
             nivel_acceso = st.radio(
-                "8.3 Nivel de Acceso de la Información:",
+                "8.3 Nivel de Accesso de la Información:",
                 ["Público", "Restringido", "Uso Interno únicamente"],
             )
-            # 🆕 8.4 Actualizado con placeholder explicativo
             url_publicacion = st.text_input(
                 "8.4 Plataforma / Enlace Web de Publicación (si aplica):",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
