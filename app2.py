@@ -335,7 +335,7 @@ if not df_matriz.empty:
             )
             fecha_ultima = st.text_input(
                 "7.2 Fecha de Última Actualización de la información (AAAA/MM):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Formato AAAA/MM",
                 value="" if st.session_state.guardado_exitoso else None,
             )
             limitaciones = st.multiselect(
@@ -363,7 +363,7 @@ if not df_matriz.empty:
             )
             uni_resp_calcul = st.text_input(
                 "7.6 Unidad Responsable de la Ficha / Cálculo:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Nombre del departamento o perfil técnico",
                 key="unidad_resp_calculo_unique",
                 value="" if st.session_state.guardado_exitoso else None,
             )
@@ -382,12 +382,12 @@ if not df_matriz.empty:
             st.header("Sección 8: Usos de la Información")
             uso_interno = st.text_area(
                 "8.1 Uso Interno Actual de la Información:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Mencione quien (unidades) que hacen uso de la información gestionada",
                 value="" if st.session_state.guardado_exitoso else None,
             )
             uso_sil = st.text_area(
                 "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA:",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Cómo puede aprovecharse en visores GIS o tableros institucionales",
                 value="" if st.session_state.guardado_exitoso else None,
             )
             nivel_acceso = st.radio(
@@ -396,7 +396,7 @@ if not df_matriz.empty:
             )
             url_publicacion = st.text_input(
                 "8.4 Plataforma / Enlace Web de Publicación (si aplica):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="URL pública del geoportal o visor web",
                 value="" if st.session_state.guardado_exitoso else None,
             )
 
