@@ -245,11 +245,11 @@ if not df_matriz.empty:
             )
             unidad_prov = st.text_input(
                 "5.4 Unidad / Dirección Interna Proveedora (si aplica):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Nombre de la unidad interna proveedora",
             )
             inst_ext_prov = st.text_input(
                 "5.5 Institución Externa Proveedora (si aplica):",
-                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                placeholder="Ejemplo: INEC, MAATE, MTOP, MAG, INAMHI",
             )
 
             st.markdown("---")
