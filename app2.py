@@ -1,9 +1,12 @@
 import os
 import pandas as pd
 import streamlit as st
+import requests
+import base64
 
-# DEFINICIÓN DE ARCHIVOS AL INICIO
+# DEFINICIÓN DE ARCHIVOS INSTITUCIONALES DEL SIL
 EXCEL_MATRIZ = "matriz_gad.xlsx"
+EXCEL_DIAGNOSTICO = "diagnostico_sil_gadpi_2026.xlsx"
 
 
 @st.cache_data
@@ -60,29 +63,26 @@ if not df_matriz.empty:
 
     if clave_admin == "gadpi2026":
         st.sidebar.success("Acceso Autorizado 👍")
-        try:
-            # Conexión nativa de Streamlit utilizando los credenciales guardados en tus Secrets de la nube
-            from streamlit_gsheets import GSheetsConnection
+        if os.path.exists(EXCEL_DIAGNOSTICO):
+            try:
+                df_descarga = pd.read_excel(EXCEL_DIAGNOSTICO)
+                import io
 
-            conn_admin = st.connection("gsheets", type=GSheetsConnection)
-            df_descarga = conn_admin.read(ttl=0)
+                buffer = io.BytesIO()
+                with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+                    df_descarga.to_excel(writer, index=False)
+                buffer.seek(0)
 
-            # Conversión binaria directa para asegurar la descarga instantánea en Excel sin bucles
-            import io
-
-            buffer = io.BytesIO()
-            with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-                df_descarga.to_excel(writer, index=False)
-            buffer.seek(0)
-
-            st.sidebar.download_button(
-                label="📥 Descargar Excel Consolidado",
-                data=buffer,
-                file_name="diagnostico_sil_gadpi_2026.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            )
-        except Exception as e:
-            st.sidebar.error(f"Error en la conexión con la base de datos: {e}")
+                st.sidebar.download_button(
+                    label="📥 Descargar Excel Consolidado",
+                    data=buffer,
+                    file_name="diagnostico_sil_gadpi_2026.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
+            except Exception as e:
+                st.sidebar.error(f"Error al procesar el archivo: {e}")
+        else:
+            st.sidebar.info("Aún no se registran fichas técnicas en la nube.")
 
     columnas = list(df_matriz.columns)
     col_dir = next((c for c in columnas if "dir" in c.lower()), "Direccion")
@@ -129,27 +129,27 @@ if not df_matriz.empty:
             sorted(df_f_prod[col_prod].dropna().unique()),
         )
 
-        # ℹ️ ADVERTENCIA AUTOMÁTICA EN SECCIÓN 2 (Si el producto ya tiene historial)
-        try:
-            from streamlit_gsheets import GSheetsConnection
-
-            conn = st.connection("gsheets", type=GSheetsConnection)
-            df_check = conn.read(ttl=0)
-            if not df_check.empty and "Producto" in df_check.columns:
+        # Alerta Informativa del Numeral 2 operando de forma local instantánea
+        if os.path.exists(EXCEL_DIAGNOSTICO):
+            try:
+                df_check = pd.read_excel(EXCEL_DIAGNOSTICO)
                 if (
-                    df_check["Producto"]
-                    .astype(str)
-                    .str.strip()
-                    .eq(str(prod_opcion).strip())
-                    .any()
+                    not df_check.empty
+                    and "Producto" in df_check.columns
+                    and (
+                        df_check["Producto"]
+                        .astype(str)
+                        .str.strip()
+                        .eq(str(prod_opcion).strip())
+                        .any()
+                    )
                 ):
                     st.info(
                         "ℹ️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
                     )
-        except:
-            pass
+            except:
+                pass
 
-        # PREGUNTA 2.2 ORIGINAL METODOLÓGICA DE APLICABILIDAD (Sí/No)
         aplica_info = st.radio(
             "2.2 ¿Aplica generación o manejo de información en este producto?",
             ["Sí", "No"],
@@ -158,14 +158,17 @@ if not df_matriz.empty:
 
         def guardar_datos_nube(registro_dicc):
             try:
-                # Lectura e inserción atómica en la nube para mitigar colisiones por concurrencia
-                df_existente = conn.read(ttl=0)
-                df_nuevo_registro = pd.DataFrame([registro_dicc])
-                df_consolidado = pd.concat(
-                    [df_existente, df_nuevo_registro], ignore_index=True
-                )
+                # 🚀 SOLUCIÓN PARADIGMÁTICA: Escritura local instantánea inmune a concurrencia
+                df_nuevo = pd.DataFrame([registro_dicc])
+                if os.path.exists(EXCEL_DIAGNOSTICO):
+                    df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
+                    df_consolidado = pd.concat(
+                        [df_existente, df_nuevo], ignore_index=True
+                    )
+                else:
+                    df_consolidado = df_nuevo
 
-                conn.update(data=df_consolidado)
+                df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
 
                 st.session_state.contador_guardado += 1
                 st.success(
@@ -175,7 +178,7 @@ if not df_matriz.empty:
                 st.rerun()
             except Exception as e:
                 st.error(
-                    f"Error de comunicación remota con Google Drive: {e}"
+                    f"Error de consistencia al escribir en la base del servidor: {e}"
                 )
 
 
@@ -370,7 +373,7 @@ if not df_matriz.empty:
                 ["Sí", "No", "En proceso"],
             )
             uni_resp_calcul = st.text_input(
-                "7.6 Unidad Responsible de la Ficha / Cálculo:",
+                "7.6 Unidad Responsable de la Ficha / Cálculo:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key="unidad_resp_calculo_unique",
             )
