@@ -259,7 +259,7 @@ if not df_matriz.empty:
             ruta_archivo = st.text_input(
                 "6.2 Nombre de archivo, BD o Enlace del medio de verificación:",
                 marcador de posicion="Ruta de red, enlace a Google Drive o repositorio",
-            )
+            ),
             difunde_terceros = st.radio(
                 "6.3 ¿Entrega o difunde este producto a terceros?",
                 ["Sí", "No"],
