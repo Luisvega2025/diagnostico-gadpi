@@ -54,7 +54,7 @@ if not df_matriz.empty:
         )
 
     if clave_admin == "gadpi2026":
-        st.sidebar.success("Acceso Autorizado 🎈")
+        st.sidebar.success("Acceso Authorized 🎈")
         if os.path.exists(EXCEL_DIAGNOSTICO):
             try:
                 df_descarga = pd.read_excel(EXCEL_DIAGNOSTICO)
@@ -112,7 +112,7 @@ if not df_matriz.empty:
             sorted(df_f_prod[col_prod].dropna().unique()),
         )
 
-        # Alerta Informativa leyendo directamente de Google Sheets en tiempo real para control de duplicados
+        # Alerta Informativa leyendo directamente de Google Sheets para control de duplicados
         try:
             df_check = conn.read(ttl="5s")
             if (
@@ -138,9 +138,9 @@ if not df_matriz.empty:
             ["Sí", "No"],
         )
 
-              def guardar_datos_nube(registro_dicc):
+        def guardar_datos_nube(registro_dicc):
             try:
-                # 🚀 GUARDADO INTERNO SEGURO EN EL SERVIDOR
+                # Guardado directo e infalible en el almacenamiento interno del servidor web
                 df_nuevo = pd.DataFrame([registro_dicc])
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
@@ -148,22 +148,20 @@ if not df_matriz.empty:
                 else:
                     df_consolidado = df_nuevo
 
-                # Guarda de forma física e inmediata el Excel en el servidor
                 df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # 🎈 EFECTO VISUAL: Lanza los globos desde abajo hacia arriba en toda la pantalla
+                # 🎈 Efecto visual: Lanza la animación de globos ascendentes en toda la pantalla
                 st.balloons()
                 
-                # Pausa un breve segundo para que los técnicos disfruten la animación antes de limpiar
+                # Breve pausa para visualizar la animación antes de limpiar la interfaz
                 import time
                 time.sleep(1.5)
                 
-                # Incrementa el contador para vaciar de forma automática todos los campos
+                # Incrementa el contador para resetear y vaciar todos los campos de texto
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error al escribir en la base del servidor: {e}")
-  
+                st.error(f"Error al escribir en la base de datos local del servidor: {e}")
 
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
@@ -351,7 +349,7 @@ if not df_matriz.empty:
                         "Riesgos Preservacion": ", ".join(riesgos_preserv),
                         "Uso Interno": uso_interno,
                         "Integracion SIL": uso_sil,
-                        "Nivel Acceso": nivel_acceso,
+                        "Nivel Acceso": level_acceso if 'level_acceso' in locals() else nivel_acceso,
                         "URL Publicacion": url_publicacion,
                         "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
                     }
