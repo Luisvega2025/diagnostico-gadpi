@@ -144,7 +144,7 @@ if not df_matriz.empty:
                 import json
                 
                 # 🚀 URL CONECTOR DIRECTO A GOOGLE APP SCRIPT (¡REEMPLAZA AQUÍ!)
-                url_google_script = "https://google.com"
+                url_google_script = "https://script.google.com/macros/s/AKfycbwqOIcRte6ytTzF5c7g_NEb8UU87JzLFQyfkIY-u5CLrVoyj3nKqva72T8ZYPoSbO3q/exec"
                 
                 # 1. Enviar los datos en tiempo real de forma externa a Google Sheets
                 payload = json.dumps(registro_dicc)
