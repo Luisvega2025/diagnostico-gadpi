@@ -138,9 +138,9 @@ if not df_matriz.empty:
             ["Sí", "No"],
         )
 
-        def guardar_datos_nube(registro_dicc):
+              def guardar_datos_nube(registro_dicc):
             try:
-                # 🚀 SOLUCIÓN DIRECTA E INFALIBLE: Guardado interno en el servidor web sin usar la escritura bloqueada de Google
+                # 🚀 GUARDADO INTERNO SEGURO EN EL SERVIDOR
                 df_nuevo = pd.DataFrame([registro_dicc])
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
@@ -148,16 +148,22 @@ if not df_matriz.empty:
                 else:
                     df_consolidado = df_nuevo
 
-                # Guarda de forma persistente en la memoria local de la app
+                # Guarda de forma física e inmediata el Excel en el servidor
                 df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # Incrementa el contador para resetear y vaciar de forma automática todos los campos
+                # 🎈 EFECTO VISUAL: Lanza los globos desde abajo hacia arriba en toda la pantalla
+                st.balloons()
+                
+                # Pausa un breve segundo para que los técnicos disfruten la animación antes de limpiar
+                import time
+                time.sleep(1.5)
+                
+                # Incrementa el contador para vaciar de forma automática todos los campos
                 st.session_state.contador_guardado += 1
-                st.success("¡Ficha de diagnóstico guardada de forma persistente en la nube institucional!")
-                st.toast("¡Registro guardado con éxito! 🎈", icon="🎈")
                 st.rerun()
             except Exception as e:
                 st.error(f"Error al escribir en la base del servidor: {e}")
+  
 
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
