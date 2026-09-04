@@ -54,7 +54,7 @@ if not df_matriz.empty:
         )
 
     if clave_admin == "gadpi2026":
-        st.sidebar.success("Acceso Authorized 🎈")
+        st.sidebar.success("Acceso Autorizado 🎈")
         if os.path.exists(EXCEL_DIAGNOSTICO):
             try:
                 df_descarga = pd.read_excel(EXCEL_DIAGNOSTICO)
@@ -140,14 +140,26 @@ if not df_matriz.empty:
 
         def guardar_datos_nube(registro_dicc):
             try:
-                # Guardado directo e infalible en el almacenamiento interno del servidor web
+                import requests
+                import json
+                
+                # 🚀 URL CONECTOR DIRECTO A GOOGLE APP SCRIPT (¡REEMPLAZA AQUÍ!)
+                url_google_script = "https://google.com"
+                
+                # 1. Enviar los datos en tiempo real de forma externa a Google Sheets
+                payload = json.dumps(registro_dicc)
+                headers = {'Content-Type': 'application/json'}
+                
+                # Envío directo que se salta las librerías de Streamlit
+                requests.post(url_google_script, data=payload, headers=headers, timeout=10)
+                
+                # 2. Respaldo local doble en el servidor por seguridad total
                 df_nuevo = pd.DataFrame([registro_dicc])
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
                     df_consolidado = pd.concat([df_existente, df_nuevo], ignore_index=True)
                 else:
                     df_consolidado = df_nuevo
-
                 df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
                 # 🎈 Efecto visual: Lanza la animación de globos ascendentes en toda la pantalla
@@ -161,7 +173,7 @@ if not df_matriz.empty:
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error al escribir en la base de datos local del servidor: {e}")
+                st.error(f"Error al enviar datos al sistema central: {e}")
 
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
@@ -349,7 +361,7 @@ if not df_matriz.empty:
                         "Riesgos Preservacion": ", ".join(riesgos_preserv),
                         "Uso Interno": uso_interno,
                         "Integracion SIL": uso_sil,
-                        "Nivel Acceso": level_acceso if 'level_acceso' in locals() else nivel_acceso,
+                        "Nivel Acceso": nivel_acceso,
                         "URL Publicacion": url_publicacion,
                         "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
                     }
