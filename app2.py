@@ -98,18 +98,16 @@ if not df_matriz.empty:
             placeholder="Nombres y Apellidos completos",
             key=f"tecnico_{st.session_state.contador_guardado}",
         )
+        
+        # 🔄 MODIFICACIÓN: Eliminada la validación restrictiva y cambiado el placeholder
         correo_ext = st.text_input(
-            "1.4 Correo Institucional (Obligatorio @imbabura.gob.ec):",
-            placeholder="ejemplo@imbabura.gob.ec",
+            "1.4 Correo Institucional / Contacto:",
+            placeholder="correo; celular",
             key=f"correo_{st.session_state.contador_guardado}",
         )
         
-        correo_valido = False
-        if correo_ext:
-            if correo_ext.strip().lower().endswith("@imbabura.gob.ec"):
-                correo_valido = True
-            else:
-                st.error("⚠️ El correo electrónico debe terminar obligatoriamente en **@imbabura.gob.ec**")
+        # El correo siempre se considera válido para liberar el botón de inmediato
+        correo_valido = True
         st.markdown("---")
         
         st.header("Sección 2: Producto e Insumo según Estatuto 2026")
@@ -152,7 +150,7 @@ if not df_matriz.empty:
                 import requests
                 import json
                 
-                # 🚀 TU URL DEFINITIVA DE GOOGLE APPS SCRIPT INCORPORADA DE FORMA FIJA:
+                # URL Conector oficial de tu Google Apps Script
                 url_google_script = "https://google.com"
                 
                 # 1. Enviar los datos en tiempo real de forma externa a Google Sheets
@@ -184,43 +182,38 @@ if not df_matriz.empty:
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             
-            # Validación de botón para caso 'No aplica'
-            if not correo_valido:
-                st.warning("🔒 El botón de guardado se habilitará cuando ingrese un correo institucional válido.")
-                st.button("💾 Guardar Producto (No Aplica)", type="secondary", disabled=True)
-            else:
-                if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
-                    reg = {
-                        "Direccion": dir_opcion,
-                        "Subunidad": sub_opcion,
-                        "Tecnico": tecnico_resp,
-                        "Contacto": correo_ext,
-                        "Producto": prod_opcion,
-                        "Aplica Info": aplica_info,
-                        "Tipo Informacion": tipo_informacion,
-                        "nombre Ins Estad": "No aplica",
-                        "Desagregacion Est": "No aplica",
-                        "Cobertura Temporal": "No aplica",
-                        "nombre Insu Carto": "No aplica",
-                        "genera cart": "No aplica",
-                        "Desagregacion GIS": "No aplica",
-                        "Anio GIS": "No aplica",
-                        "Escala GIS": "No aplica",
-                        "Formato GIS": "No aplica",
-                        "Otro Formato GIS": "No aplica",
-                        "Genera Info Georreferenciada": "No aplica",
-                        "Otras Fuentes GIS": "No aplica",
-                        "Tiene Metadatos": "No aplica",
-                        "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
-                    }
-                    guardar_datos_nube(reg)
+            # El botón ya no se bloqueará porque correo_valido es siempre True
+            if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
+                reg = {
+                    "Direccion": dir_opcion,
+                    "Subunidad": sub_opcion,
+                    "Tecnico": tecnico_resp,
+                    "Contacto": correo_ext,
+                    "Producto": prod_opcion,
+                    "Aplica Info": aplica_info,
+                    "Tipo Informacion": tipo_informacion,
+                    "nombre Ins Estad": "No aplica",
+                    "Desagregacion Est": "No aplica",
+                    "Cobertura Temporal": "No aplica",
+                    "nombre Insu Carto": "No aplica",
+                    "genera cart": "No aplica",
+                    "Desagregacion GIS": "No aplica",
+                    "Anio GIS": "No aplica",
+                    "Escala GIS": "No aplica",
+                    "Formato GIS": "No aplica",
+                    "Otro Formato GIS": "No aplica",
+                    "Genera Info Georreferenciada": "No aplica",
+                    "Otras Fuentes GIS": "No aplica",
+                    "Tiene Metadatos": "No aplica",
+                    "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
+                }
+                guardar_datos_nube(reg)
         else:
             # LÓGICA DE CONDICIONALES PARA MOSTRAR U OCULTAR SECCIONES SEGÚN PREGUNTA 2.3
             if tipo_informacion == "Alfanumérica / Estadística":
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
                 
-                # Sincronizado textualmente con la columna de tu Google Sheet
                 nombre_ins_estad = st.text_input(
                     "3.1 ¿Nombre del insumo estadístico/alfanumérico que aporta a este producto?",
                     placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
@@ -246,14 +239,12 @@ if not df_matriz.empty:
                 st.markdown("---")
                 st.header("Sección 4: Datos Geográficos (GIS)")
                 
-                # Sincronizado textualmente con la columna de tu Google Sheet
                 nombre_insu_carto = st.text_input(
                     "4.1 ¿Nombre del insumo cartográfico que aporta a este producto?",
                     placeholder="ejem: vias.shp/*nombre.mxd/nombre.gdb",
                     key=f"insumo_carto_{st.session_state.contador_guardado}"
                 )
                 
-                # Sincronizado textualmente con la columna de tu Google Sheet
                 genera_cart = st.radio(
                     "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
                     ["Sí", "No"],
@@ -307,7 +298,7 @@ if not df_matriz.empty:
                 # Valores por defecto para el bloque estadístico que se ocultó en este flujo
                 nombre_ins_estad, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
 
-            # El flujo alfanumérico unificado salta directamente aquí (Sección 5)
+            # El flujo alfanumérico salta directamente a la sección de fuentes
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
@@ -398,7 +389,7 @@ if not df_matriz.empty:
                 placeholder="Como puede aprovecharse la información",
                 key=f"usosil_{st.session_state.contador_guardado}",
             )
-            nivel_acceso = st.radio("8.3 Nivel de Acceso de la Información / Nivel Acceso:", ["Público", "Restringido", "Uso Interno únicamente"])
+            nivel_acceso = st.radio("8.3 Nivel de Acceso de la Información / Nivel Accesso:", ["Público", "Restringido", "Uso Interno únicamente"])
             url_publicacion = st.text_input(
                 "8.4 Plataforma / Enlace Web de Publicación (si aplica) / URL Publicacion:",
                 placeholder="URL pública del geoportal o visor web",
@@ -407,59 +398,55 @@ if not df_matriz.empty:
 
             st.markdown("---")
             
-            # Validación dinámica del botón principal de guardado
-            if not correo_valido:
-                st.warning("🔒 El botón de guardado permanece bloqueado hasta que ingrese un correo institucional válido en la Sección 1.")
-                st.button("💾 Guardar Ficha de Diagnóstico", type="primary", disabled=True)
-            else:
-                if st.button("💾 Guardar Ficha de Diagnóstico", type="primary"):
-                    if not tecnico_resp:
-                        st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
-                    else:
-                        reg = {
-                            "Direccion": dir_opcion,
-                            "Subunidad": sub_opcion,
-                            "Tecnico": tecnico_resp,
-                            "Contacto": correo_ext,
-                            "Producto": prod_opcion,
-                            "Aplica Info": aplica_info,
-                            "Tipo Informacion": tipo_informacion,
-                            "nombre Ins Estad": nombre_ins_estad,
-                            "Desagregacion Est": ", ".join(desag_est) if isinstance(desag_est, list) else desag_est,
-                            "Cobertura Temporal": cobertura_est,
-                            "nombre Insu Carto": nombre_insu_carto,
-                            "genera cart": genera_cart,
-                            "Desagregacion GIS": ", ".join(desag_gis) if isinstance(desag_gis, list) else desag_gis,
-                            "Anio GIS": anio_gis,
-                            "Escala GIS": escala_gis,
-                            "Formato GIS": ", ".join(formato_gis) if isinstance(formato_gis, list) else formato_gis,
-                            "Otro Formato GIS": otro_formato_gis,
-                            "Genera Info Georreferenciada": genera_info_georref,
-                            "Otras Fuentes GIS": otras_fuentes_gis,
-                            "Tiene Metadatos": tiene_metadatos,
-                            "Unidad Medida": unidad_medida,
-                            "Fuente Origen": fuente_origen,
-                            "Nombre Fuente": nombre_fuente,
-                            "Unidad Prov": unidad_prov,
-                            "Inst Ext Prov": inst_ext_prov,
-                            "Medio Verificacion": ", ".join(medio_verif) if isinstance(medio_verif, list) else medio_verif,
-                            "Ruta/Enlace": ruta_archivo,
-                            "Difunde Terceros": difunde_terceros,
-                            "Destinatarios": ", ".join(destinatarios) if isinstance(destinatarios, list) else destinatarios,
-                            "Frecuencia Act": frec_act,
-                            "Fecha Ultima Act": fecha_ultima,
-                            "Limitaciones": ", ".join(limitaciones) if isinstance(limitaciones, list) else limitaciones,
-                            "Otra Razon Limitacion": otra_razon_limitacion,
-                            "Alineacion Planif": ", ".join(planificacion) if isinstance(planificacion, list) else planificacion,
-                            "Ficha Metodologica": ficha_met,
-                            "Unidad Resp Calculo": uni_resp_calcul,
-                            "Riesgos Preservacion": ", ".join(riesgos_preserv) if isinstance(riesgos_preserv, list) else riesgos_preserv,
-                            "Uso Interno": uso_interno,
-                            "Integracion SIL": uso_sil,
-                            "Nivel Acceso": nivel_acceso,
-                            "URL Publicacion": url_publicacion,
-                            "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
-                        }
-                        guardar_datos_nube(reg)
+            # Validación simplificada: Guarda directamente si el técnico escribió su nombre
+            if st.button("💾 Guardar Ficha de Diagnóstico", type="primary"):
+                if not tecnico_resp:
+                    st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
+                else:
+                    reg = {
+                        "Direccion": dir_opcion,
+                        "Subunidad": sub_opcion,
+                        "Tecnico": tecnico_resp,
+                        "Contacto": correo_ext,
+                        "Producto": prod_opcion,
+                        "Aplica Info": aplica_info,
+                        "Tipo Informacion": tipo_informacion,
+                        "nombre Ins Estad": nombre_ins_estad,
+                        "Desagregacion Est": ", ".join(desag_est) if isinstance(desag_est, list) else desag_est,
+                        "Cobertura Temporal": cobertura_est,
+                        "nombre Insu Carto": nombre_insu_carto,
+                        "genera cart": genera_cart,
+                        "Desagregacion GIS": ", ".join(desag_gis) if isinstance(desag_gis, list) else desag_gis,
+                        "Anio GIS": anio_gis,
+                        "Escala GIS": escala_gis,
+                        "Formato GIS": ", ".join(formato_gis) if isinstance(formato_gis, list) else formato_gis,
+                        "Otro Formato GIS": otro_formato_gis,
+                        "Genera Info Georreferenciada": genera_info_georref,
+                        "Otras Fuentes GIS": otras_fuentes_gis,
+                        "Tiene Metadatos": tiene_metadatos,
+                        "Unidad Medida": unidad_medida,
+                        "Fuente Origen": fuente_origen,
+                        "Nombre Fuente": nombre_fuente,
+                        "Unidad Prov": unidad_prov,
+                        "Inst Ext Prov": inst_ext_prov,
+                        "Medio Verificacion": ", ".join(medio_verif) if isinstance(medio_verif, list) else medio_verif,
+                        "Ruta/Enlace": ruta_archivo,
+                        "Difunde Terceros": difunde_terceros,
+                        "Destinatarios": ", ".join(destinatarios) if isinstance(destinatarios, list) else destinatarios,
+                        "Frecuencia Act": frec_act,
+                        "Fecha Ultima Act": fecha_ultima,
+                        "Limitaciones": ", ".join(limitaciones) if isinstance(limitaciones, list) else limitaciones,
+                        "Otra Razon Limitacion": otra_razon_limitacion,
+                        "Alineacion Planif": ", ".join(planificacion) if isinstance(planificacion, list) else planificacion,
+                        "Ficha Metodologica": ficha_met,
+                        "Unidad Resp Calculo": uni_resp_calcul,
+                        "Riesgos Preservacion": ", ".join(riesgos_preserv) if isinstance(riesgos_preserv, list) else riesgos_preserv,
+                        "Uso Interno": uso_interno,
+                        "Integracion SIL": uso_sil,
+                        "Nivel Acceso": nivel_acceso,
+                        "URL Publicacion": url_publicacion,
+                        "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
+                    }
+                    guardar_datos_nube(reg)
     except KeyError as e:
         st.error(f"Error al acoplar las columnas: {columnas}")
