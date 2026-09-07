@@ -99,10 +99,18 @@ if not df_matriz.empty:
             key=f"tecnico_{st.session_state.contador_guardado}",
         )
         correo_ext = st.text_input(
-            "1.4 Correo Institucional, Extensión Telefónica, cell:",
-            placeholder="ejemplo@imbabura.gob.ec - Ext. 0000 , cell",
+            "1.4 Correo Institucional (Obligatorio @imbabura.gob.ec):",
+            placeholder="ejemplo@imbabura.gob.ec",
             key=f"correo_{st.session_state.contador_guardado}",
         )
+        
+        # Guardamos el estado de la validación del correo institucional
+        correo_valido = False
+        if correo_ext:
+            if correo_ext.strip().lower().endswith("@imbabura.gob.ec"):
+                correo_valido = True
+            else:
+                st.error("⚠️ El correo electrónico debe terminar obligatoriamente en **@imbabura.gob.ec**")
         st.markdown("---")
         
         st.header("Sección 2: Producto e Insumo según Estatuto 2026")
@@ -133,8 +141,17 @@ if not df_matriz.empty:
             key=f"insumo_{st.session_state.contador_guardado}",
         )
 
+        # NUEVA PREGUNTA CONDICIONAL CON ADVERTENCIA DE CONTROL INDEPENDIENTE
+        tipo_informacion = st.radio(
+            "2.3 Tipo de información que genera/utiliza?:",
+            ["Estadística / Alfanumérica", "Geográfica"],
+            key=f"tipo_info_{st.session_state.contador_guardado}"
+        )
+
+        st.warning("⚠️ **SI TIENE LOS DOS TIPOS DE INFORMACIÓN, DEBE LLENAR UN REGISTRO A LA VEZ POR INSUMO.**")
+
         aplica_info = st.radio(
-            "2.3 ¿Aplica o genera información para cumplir con este producto?",
+            "2.4 ¿Aplica o genera información para cumplir con este producto?",
             ["Sí", "No"],
         )
 
@@ -143,14 +160,12 @@ if not df_matriz.empty:
                 import requests
                 import json
                 
-                # 🚀 URL CONECTOR DIRECTO A GOOGLE APP SCRIPT (¡REEMPLAZA AQUÍ!)
-                url_google_script = "https://script.google.com/macros/s/AKfycbwqOIcRte6ytTzF5c7g_NEb8UU87JzLFQyfkIY-u5CLrVoyj3nKqva72T8ZYPoSbO3q/exec"
+                # URL Conector de tu Google Apps Script oficial
+                url_google_script = "https://google.com"
                 
                 # 1. Enviar los datos en tiempo real de forma externa a Google Sheets
                 payload = json.dumps(registro_dicc)
                 headers = {'Content-Type': 'application/json'}
-                
-                # Envío directo que se salta las librerías de Streamlit
                 requests.post(url_google_script, data=payload, headers=headers, timeout=10)
                 
                 # 2. Respaldo local doble en el servidor por seguridad total
@@ -162,10 +177,9 @@ if not df_matriz.empty:
                     df_consolidado = df_nuevo
                 df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # 🎈 Efecto visual: Lanza la animación de globos ascendentes en toda la pantalla
+                # 🎈 Efecto visual: Animación de globos ascendentes
                 st.balloons()
                 
-                # Breve pausa para visualizar la animación antes de limpiar la interfaz
                 import time
                 time.sleep(1.5)
                 
@@ -177,59 +191,75 @@ if not df_matriz.empty:
 
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
-            if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
-                reg = {
-                    "Direccion": dir_opcion,
-                    "Subunidad": sub_opcion,
-                    "Tecnico": tecnico_resp,
-                    "Contacto": correo_ext,
-                    "Producto": prod_opcion,
-                    "Insumo Identificador": insumo_identificador,
-                    "Aplica Info": "No",
-                    "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
-                }
-                guardar_datos_nube(reg)
-        else:
-            st.markdown("---")
-            st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
-            gen_est = st.radio("3.1 ¿Genera o posee Datos Estadísticos/alfanuméricos?", ["Sí", "No"])
-            if gen_est == "Sí":
-                desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadistica:",
-                    ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
-                )
-                cobertura_est = st.text_input(
-                    "3.3 Temporalidad de Datos Estadísticos:",
-                    placeholder="Ejemplo: 2018 - 2026",
-                    key=f"cobertura_{st.session_state.contador_guardado}",
-                )
-            else:
-                desag_est, cobertura_est = ["No aplica"], "No aplica"
-
-            st.markdown("---")
-            st.header("Sección 4: Datos Geográficos (GIS)")
-            gen_gis = st.radio("4.1 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", ["Sí", "No"])
-            if gen_gis == "Sí":
-                desag_gis = st.multiselect(
-                    "4.2 Nivel de Desagregación Geográfica:",
-                    ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
-                )
-                anio_gis = st.text_input(
-                    "4.3 Año de Datos Geográficos:",
-                    placeholder="Ejemplo: 2020 - 2026",
-                    key=f"aniogis_{st.session_state.contador_guardado}",
-                )
-                escala_gis = st.selectbox(
-                    "4.4 Escala de la cartografia:",
-                    ["1:5.000", "1:25.000", "1:50.000", "1:100.000", "No"],
-                )
-                formato_gis = st.multiselect(
-                    "4.5 Formato de Datos Geográficos Disponibles:",
-                    ["File Geodatabase (.gdb)", "Shapefile (.shp)", "GeoJSON / KML", "Tabla XY (Excel / CSV)", "Servicio Web (WMS/WFS)"],
-                )
-            else:
-                desag_gis, anio_gis, escala_gis, formato_gis = ["No aplica"], "No aplica", "No aplica", ["No aplica"]
             
+            # Validación de botón para caso 'No aplica'
+            if not correo_valido:
+                st.warning("🔒 El botón de guardado se habilitará cuando ingrese un correo institucional válido.")
+                st.button("💾 Guardar Producto (No Aplica)", type="secondary", disabled=True)
+            else:
+                if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
+                    reg = {
+                        "Direccion": dir_opcion,
+                        "Subunidad": sub_opcion,
+                        "Tecnico": tecnico_resp,
+                        "Contacto": correo_ext,
+                        "Producto": prod_opcion,
+                        "Insumo Identificador": insumo_identificador,
+                        "Tipo Informacion": tipo_informacion,
+                        "Aplica Info": "No",
+                        "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
+                    }
+                    guardar_datos_nube(reg)
+        else:
+            # LÓGICA DE CONDICIONALES PARA MOSTRAR U OCULTAR SECCIONES SEGÚN PREGUNTA 2.3
+            if tipo_informacion == "Estadística / Alfanumérica":
+                st.markdown("---")
+                st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
+                gen_est = st.radio("3.1 ¿Genera o posee Datos Estadísticos/alfanuméricos?", ["Sí", "No"])
+                if gen_est == "Sí":
+                    desag_est = st.multiselect(
+                        "3.2 Nivel de Desagregación estadística:",
+                        ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
+                    )
+                    cobertura_est = st.text_input(
+                        "3.3 Temporalidad de Datos Estadísticos:",
+                        placeholder="Ejemplo: 2018 - 2026",
+                        key=f"cobertura_{st.session_state.contador_guardado}",
+                    )
+                else:
+                    desag_est, cobertura_est = ["No aplica"], "No aplica"
+                
+                # Valores por defecto para el bloque geográfico que se ocultó
+                gen_gis, desag_gis, anio_gis, escala_gis, formato_gis = "No aplica", ["No aplica"], "No aplica", "No aplica", ["No aplica"]
+
+            else:  # Caso: "Geográfica"
+                st.markdown("---")
+                st.header("Sección 4: Datos Geográficos (GIS)")
+                gen_gis = st.radio("4.1 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", ["Sí", "No"])
+                if gen_gis == "Sí":
+                    desag_gis = st.multiselect(
+                        "4.2 Nivel de Desagregación Geográfica:",
+                        ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
+                    )
+                    anio_gis = st.text_input(
+                        "4.3 Año de Datos Geográficos:",
+                        placeholder="Ejemplo: 2020 - 2026",
+                        key=f"aniogis_{st.session_state.contador_guardado}",
+                    )
+                    escala_gis = st.selectbox(
+                        "4.4 Escala de la cartografía:",
+                        ["1:5.000", "1:25.000", "1:50.000", "1:100.000", "No"],
+                    )
+                    formato_gis = st.multiselect(
+                        "4.5 Formato de Datos Geográficos Disponibles:",
+                        ["File Geodatabase (.gdb)", "Shapefile (.shp)", "GeoJSON / KML", "Tabla XY (Excel / CSV)", "Servicio Web (WMS/WFS)"],
+                    )
+                else:
+                    desag_gis, anio_gis, escala_gis, formato_gis = ["No aplica"], "No aplica", "No aplica", ["No aplica"]
+                
+                # Valores por defecto para el bloque estadístico que se ocultó
+                gen_est, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
+
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
@@ -299,7 +329,7 @@ if not df_matriz.empty:
                 key=f"uniresp_{st.session_state.contador_guardado}",
             )
             riesgos_preserv = st.multiselect(
-                "7.7 Identificación de Riesgos de Preservación dela Información:",
+                "7.7 Identificación de Riesgos de Preservación de la Información:",
                 ["Dependencia una persona", "Ausencia respaldos", "Virus/Fallos", "Rotación personal", "Deterioro papel"],
             )
 
@@ -323,48 +353,39 @@ if not df_matriz.empty:
             )
 
             st.markdown("---")
-            if st.button("💾 Guardar Ficha de Diagnóstico", type="primary"):
-                if not tecnico_resp or not correo_ext:
-                    st.warning("Complete los datos del Técnico Responsable en la Sección 1.")
-                else:
-                    reg = {
-                        "Direccion": dir_opcion,
-                        "Subunidad": sub_opcion,
-                        "Tecnico": tecnico_resp,
-                        "Contacto": correo_ext,
-                        "Producto": prod_opcion,
-                        "Insumo Identificador": insumo_identificador,
-                        "Aplica Info": aplica_info,
-                        "Datos Estadisticos": gen_est,
-                        "Desagregacion Est": ", ".join(desag_est),
-                        "Cobertura Temporal": cobertura_est,
-                        "Datos GIS": gen_gis,
-                        "Desagregacion GIS": ", ".join(desag_gis),
-                        "Anio GIS": anio_gis,
-                        "Escala GIS": escala_gis,
-                        "Formato GIS": ", ".join(formato_gis),
-                        "Unidad Medida": unidad_medida,
-                        "Fuente Origen": fuente_origen,
-                        "Nombre Fuente": nombre_fuente,
-                        "Unidad Prov": unidad_prov,
-                        "Inst Ext Prov": inst_ext_prov,
-                        "Medio Verificacion": ", ".join(medio_verif),
-                        "Ruta/Enlace": ruta_archivo,
-                        "Difunde Terceros": difunde_terceros,
-                        "Destinatarios": ", ".join(destinatarios),
-                        "Frecuencia Act": frec_act,
-                        "Fecha Ultima Act": fecha_ultima,
-                        "Limitaciones": ", ".join(limitaciones),
-                        "Alineacion Planif": ", ".join(planificacion),
-                        "Ficha Metodologica": ficha_met,
-                        "Unidad Resp Cálculo": uni_resp_calcul,
-                        "Riesgos Preservacion": ", ".join(riesgos_preserv),
-                        "Uso Interno": uso_interno,
-                        "Integracion SIL": uso_sil,
-                        "Nivel Acceso": nivel_acceso,
-                        "URL Publicacion": url_publicacion,
-                        "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
-                    }
-                    guardar_datos_nube(reg)
-    except KeyError as e:
-        st.error(f"Error al acoplar las columnas: {columnas}")
+            
+            # Validación dinámica del botón principal de guardado
+            if not correo_valido:
+                st.warning("🔒 El botón de guardado permanece bloqueado hasta que ingrese un correo institucional válido en la Sección 1.")
+                st.button("💾 Guardar Ficha de Diagnóstico", type="primary", disabled=True)
+            else:
+                if st.button("💾 Guardar Ficha de Diagnóstico", type="primary"):
+                    if not tecnico_resp:
+                        st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
+                    else:
+                        reg = {
+                            "Direccion": dir_opcion,
+                            "Subunidad": sub_opcion,
+                            "Tecnico": tecnico_resp,
+                            "Contacto": correo_ext,
+                            "Producto": prod_opcion,
+                            "Insumo Identificador": insumo_identificador,
+                            "Tipo Informacion": tipo_informacion,
+                            "Aplica Info": aplica_info,
+                            "Datos Estadisticos": gen_est,
+                            "Desagregacion Est": ", ".join(desag_est),
+                            "Cobertura Temporal": cobertura_est,
+                            "Datos GIS": gen_gis,
+                            "Desagregacion GIS": ", ".join(desag_gis),
+                            "Anio GIS": anio_gis,
+                            "Escala GIS": escala_gis,
+                            "Formato GIS": ", ".join(formato_gis),
+                            "Unidad Medida": unidad_medida,
+                            "Fuente Origen": fuente_origen,
+                            "Nombre Fuente": nombre_fuente,
+                            "Unidad Prov": unidad_prov,
+                            "Inst Ext Prov": inst_ext_prov,
+                            "Medio Verificacion": ", ".join(medio_verif),
+                            "Ruta/Enlace": ruta_archivo,
+                            "Difunde Terceros": difunde_terceros,
+                            "Destinatarios": ", ".join(destinatarios),
