@@ -122,7 +122,7 @@ if not df_matriz.empty:
                 and (df_check["Producto"].astype(str).str.strip().eq(str(prod_opcion).strip()).any())
             ):
                 st.info(
-                    "ℹ️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
+                    "ℹ/️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
                 )
         except:
             pass
@@ -224,7 +224,7 @@ if not df_matriz.empty:
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
                 
-                # Definición limpia de contingencias para las columnas GIS del mismo registro
+                # 🛠️ CORRECCIÓN ABSOLUTA: Se definen limpias todas las llaves GIS en "No aplica"
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
                 formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
 
