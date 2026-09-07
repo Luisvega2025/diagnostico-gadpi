@@ -207,7 +207,6 @@ if not df_matriz.empty:
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
                 
-                # 🔄 MODIFICACIÓN 4: Campo de texto con marcador de posición exacto
                 insumo_estadistico = st.text_input(
                     "3.1 ¿Nombre del insumo estadístico/alfanumérico que aporta a este producto?",
                     placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
@@ -225,53 +224,72 @@ if not df_matriz.empty:
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
                 
-                # ➕ MODIFICACIÓN 5: Nueva pregunta 3.4 de selección exclusiva
-                frecuencia_est = st.selectbox(
-                    "3.4 Frecuencia de actualización de la información estadística/alfanumérica:",
-                    [
-                        "Continuo / Real-time", 
-                        "Mensual", 
-                        "Trimestral", 
-                        "Semestral", 
-                        "Anual", 
-                        "Por demanda / Sin periodicidad", 
-                        "No se actualizan"
-                    ],
-                    key=f"frec_est_{st.session_state.contador_guardado}"
-                )
-                
-                # Valores de contingencia automáticos para el bloque geográfico que se ocultó
+                # Valores de contingencia automáticos para el bloque geográfico e ingresos adicionales
                 gen_gis, desag_gis, anio_gis, escala_gis, formato_gis = "No aplica", ["No aplica"], "No aplica", "No aplica", ["No aplica"]
+                otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = "No aplica", "No aplica", "No aplica", "No aplica"
 
             else:  # Caso: "Geográfica"
                 st.markdown("---")
                 st.header("Sección 4: Datos Geográficos (GIS)")
-                gen_gis = st.radio("4.1 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", ["Sí", "No"])
-                if gen_gis == "Sí":
-                    desag_gis = st.multiselect(
-                        "4.2 Nivel de Desagregación Geográfica:",
-                        ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
-                    )
-                    anio_gis = st.text_input(
-                        "4.3 Año de Datos Geográficos:",
-                        placeholder="Ejemplo: 2020 - 2026",
-                        key=f"aniogis_{st.session_state.contador_guardado}",
-                    )
-                    escala_gis = st.selectbox(
-                        "4.4 Escala de la cartografía:",
-                        ["1:5.000", "1:25.000", "1:50.000", "1:100.000", "No"],
-                    )
-                    formato_gis = st.multiselect(
-                        "4.5 Formato de Datos Geográficos Disponibles:",
-                        ["File Geodatabase (.gdb)", "Shapefile (.shp)", "GeoJSON / KML", "Tabla XY (Excel / CSV)", "Servicio Web (WMS/WFS)"],
-                    )
-                else:
-                    desag_gis, anio_gis, escala_gis, formato_gis = ["No aplica"], "No aplica", "No aplica", ["No aplica"]
+                
+                # 🔄 MODIFICACIÓN: Campo de texto con marcador de posición exacto solicitado
+                insumo_cartografico = st.text_input(
+                    "4.1 ¿Nombre del insumo cartográfico que aporta a este producto?",
+                    placeholder="ejem: vias.shp/*nombre.mxd/nombre.gdb",
+                    key=f"insumo_carto_{st.session_state.contador_guardado}"
+                )
+                
+                gen_gis = st.radio("4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", ["Sí", "No"])
+                
+                desag_gis = st.multiselect(
+                    "4.3 Nivel de Desagregación Geográfica:",
+                    ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
+                )
+                
+                anio_gis = st.text_input(
+                    "4.4 Año de Datos Geográficos:",
+                    placeholder="Ejemplo: 2020 - 2026",
+                    key=f"aniogis_{st.session_state.contador_guardado}",
+                )
+                
+                escala_gis = st.selectbox(
+                    "4.5 Escala de la cartografía:",
+                    ["1:5.000", "1:25.000", "1:50.000", "1:100.000", "No"],
+                )
+                
+                formato_gis = st.multiselect(
+                    "4.6 Formato de Datos Geográficos Disponibles:",
+                    ["File Geodatabase (.gdb)", "Shapefile (.shp)", "GeoJSON / KML", "Tabla XY (Excel / CSV)", "Servicio Web (WMS/WFS)"],
+                )
+                
+                # ➕ NUEVAS PREGUNTAS INCORPORADAS DE LA SECCIÓN 4
+                otro_formato_gis = st.text_input(
+                    "4.7 ¿Otro formato?",
+                    key=f"otro_formato_{st.session_state.contador_guardado}"
+                )
+                
+                genera_info_georref = st.text_input(
+                    "4.8 ¿Genera información georreferenciada - Cartografía?",
+                    placeholder="ejem: si, archivo shp, maps mxd, etc",
+                    key=f"genera_georref_{st.session_state.contador_guardado}"
+                )
+                
+                otras_fuentes_gis = st.text_input(
+                    "4.9 ¿Obtiene de otras fuentes? Cuáles?",
+                    placeholder="ejem: IGM, INEC, MAG, etc",
+                    key=f"otras_fuentes_{st.session_state.contador_guardado}"
+                )
+                
+                tiene_metadatos = st.text_input(
+                    "4.10 ¿Tiene metadatos, catálogo de objetos?",
+                    placeholder="si/no",
+                    key=f"metadatos_{st.session_state.contador_guardado}"
+                )
                 
                 # Valores por defecto para el bloque estadístico que se ocultó en este flujo
-                insumo_estadistico, desag_est, cobertura_est, frecuencia_est = "No aplica", ["No aplica"], "No aplica", "No aplica"
+                insumo_estadistico, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
 
-            # 🔄 MODIFICACIÓN 6: El flujo alfanumérico salta directamente aquí (Sección 5)
+            # El flujo alfanumérico salta directamente aquí esquivando la cartografía de arriba
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
@@ -343,6 +361,13 @@ if not df_matriz.empty:
                 "7.7 Identificación de Riesgos de Preservación de la Información:",
                 ["Dependencia una persona", "Ausencia respaldos", "Virus/Fallos", "Rotación personal", "Deterioro papel"],
             )
+            
+            # ➕ NUEVA PREGUNTA INCORPORADA DE LA SECCIÓN 7
+            otra_razon_limitacion = st.text_input(
+                "7.8 ¿Otra razón?",
+                placeholder="describa",
+                key=f"otra_razon_{st.session_state.contador_guardado}"
+            )
 
             st.markdown("---")
             st.header("Sección 8: Usos de la Información")
@@ -385,12 +410,16 @@ if not df_matriz.empty:
                             "Aplica Info": aplica_info,
                             "Desagregacion Est": ", ".join(desag_est),
                             "Cobertura Temporal": cobertura_est,
-                            "Frecuencia Act Est": frecuencia_est,
+                            "Insumo Cartografico": gen_gis if tipo_informacion == "Alfanumérica / Estadística" else insumo_cartografico,
                             "Datos GIS": gen_gis,
                             "Desagregacion GIS": ", ".join(desag_gis),
                             "Anio GIS": anio_gis,
                             "Escala GIS": escala_gis,
                             "Formato GIS": ", ".join(formato_gis),
+                            "Otro Formato GIS": otro_formato_gis,
+                            "Genera Info Georreferenciada": genera_info_georref,
+                            "Otras Fuentes GIS": otras_fuentes_gis,
+                            "Tiene Metadatos": tiene_metadatos,
                             "Unidad Medida": unidad_medida,
                             "Fuente Origen": fuente_origen,
                             "Nombre Fuente": nombre_fuente,
@@ -403,6 +432,7 @@ if not df_matriz.empty:
                             "Frecuencia Act": frec_act,
                             "Fecha Ultima Act": fecha_ultima,
                             "Limitaciones": ", ".join(limitaciones),
+                            "Otra Razon Limitacion": otra_razon_limitacion,
                             "Alineacion Planif": ", ".join(planificacion),
                             "Ficha Metodologica": ficha_met,
                             "Unidad Resp Cálculo": uni_resp_calcul,
