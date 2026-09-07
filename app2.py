@@ -133,21 +133,18 @@ if not df_matriz.empty:
         except:
             pass
 
-        # Renumerada a 2.2 según lo solicitado
         aplica_info = st.radio(
             "2.2 ¿Aplica o genera información para cumplir con este producto?",
             ["Sí", "No"],
             key=f"aplica_{st.session_state.contador_guardado}"
         )
 
-        # Nueva pregunta 2.3 condicional
         tipo_informacion = st.radio(
             "2.3 Tipo de información que genera/utiliza?:",
             ["Alfanumérica / Estadística", "Geográfica"],
             key=f"tipo_info_{st.session_state.contador_guardado}"
         )
 
-        # ℹ️ Texto Informativo de Control Obligatorio antes del bloque técnico
         st.info("ℹ️ **SI TIENE LOS DOS TIPOS DE INFORMACIÓN SE DEBE LLENAR UN REGISTRO A LA VEZ POR INSUMO (alfanumérico o Cartográfico)**")
 
         def guardar_datos_nube(registro_dicc):
@@ -172,7 +169,7 @@ if not df_matriz.empty:
                     df_consolidado = df_nuevo
                 df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # 🎈 Animación oficial de globos ascendentes
+                # 🎈 Animación de globos ascendentes
                 st.balloons()
                 
                 import time
@@ -209,21 +206,41 @@ if not df_matriz.empty:
             if tipo_informacion == "Alfanumérica / Estadística":
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
-                gen_est = st.radio("3.1 ¿Genera o posee Datos Estadísticos/alfanuméricos?", ["Sí", "No"])
-                if gen_est == "Sí":
-                    desag_est = st.multiselect(
-                        "3.2 Nivel de Desagregación estadística:",
-                        ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
-                    )
-                    cobertura_est = st.text_input(
-                        "3.3 Temporalidad de Datos Estadísticos:",
-                        placeholder="Ejemplo: 2018 - 2026",
-                        key=f"cobertura_{st.session_state.contador_guardado}",
-                    )
-                else:
-                    desag_est, cobertura_est = ["No aplica"], "No aplica"
                 
-                # Valores por defecto para el bloque geográfico que se ocultó
+                # 🔄 MODIFICACIÓN 4: Campo de texto con marcador de posición exacto
+                insumo_estadistico = st.text_input(
+                    "3.1 ¿Nombre del insumo estadístico/alfanumérico que aporta a este producto?",
+                    placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
+                    key=f"insumo_est_{st.session_state.contador_guardado}"
+                )
+                
+                desag_est = st.multiselect(
+                    "3.2 Nivel de Desagregación estadística:",
+                    ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
+                )
+                
+                cobertura_est = st.text_input(
+                    "3.3 Temporalidad de Datos Estadísticos:",
+                    placeholder="Ejemplo: 2018 - 2026",
+                    key=f"cobertura_{st.session_state.contador_guardado}",
+                )
+                
+                # ➕ MODIFICACIÓN 5: Nueva pregunta 3.4 de selección exclusiva
+                frecuencia_est = st.selectbox(
+                    "3.4 Frecuencia de actualización de la información estadística/alfanumérica:",
+                    [
+                        "Continuo / Real-time", 
+                        "Mensual", 
+                        "Trimestral", 
+                        "Semestral", 
+                        "Anual", 
+                        "Por demanda / Sin periodicidad", 
+                        "No se actualizan"
+                    ],
+                    key=f"frec_est_{st.session_state.contador_guardado}"
+                )
+                
+                # Valores de contingencia automáticos para el bloque geográfico que se ocultó
                 gen_gis, desag_gis, anio_gis, escala_gis, formato_gis = "No aplica", ["No aplica"], "No aplica", "No aplica", ["No aplica"]
 
             else:  # Caso: "Geográfica"
@@ -251,9 +268,10 @@ if not df_matriz.empty:
                 else:
                     desag_gis, anio_gis, escala_gis, formato_gis = ["No aplica"], "No aplica", "No aplica", ["No aplica"]
                 
-                # Valores por defecto para el bloque estadístico que se ocultó
-                gen_est, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
+                # Valores por defecto para el bloque estadístico que se ocultó en este flujo
+                insumo_estadistico, desag_est, cobertura_est, frecuencia_est = "No aplica", ["No aplica"], "No aplica", "No aplica"
 
+            # 🔄 MODIFICACIÓN 6: El flujo alfanumérico salta directamente aquí (Sección 5)
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
@@ -299,7 +317,7 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
-                "7.1 Frecuencia de Actualización:",
+                "7.1 Frecuencia de Actualización General:",
                 ["Continuo", "Mensual", "Trimestral", "Semestral", "Anual", "Por demanda", "No se actualizan"],
             )
             fecha_ultima = st.text_input(
@@ -362,11 +380,12 @@ if not df_matriz.empty:
                             "Tecnico": tecnico_resp,
                             "Contacto": correo_ext,
                             "Producto": prod_opcion,
+                            "Insumo Estadistico": insumo_estadistico,
                             "Tipo Informacion": tipo_informacion,
                             "Aplica Info": aplica_info,
-                            "Datos Estadisticos": gen_est,
                             "Desagregacion Est": ", ".join(desag_est),
                             "Cobertura Temporal": cobertura_est,
+                            "Frecuencia Act Est": frecuencia_est,
                             "Datos GIS": gen_gis,
                             "Desagregacion GIS": ", ".join(desag_gis),
                             "Anio GIS": anio_gis,
