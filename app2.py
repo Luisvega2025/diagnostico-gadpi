@@ -103,6 +103,8 @@ if not df_matriz.empty:
             placeholder="correo; celular",
             key=f"correo_{st.session_state.contador_guardado}",
         )
+        
+        correo_valido = True
         st.markdown("---")
         st.header("Sección 2: Producto e Insumo según Estatuto 2026")
         df_f_prod = df_f_sub[df_f_sub[col_sub] == sub_opcion]
@@ -144,7 +146,7 @@ if not df_matriz.empty:
                 import requests
                 import json
                 
-                # 🚀 TU URL DEFINITIVA DE GOOGLE APPS SCRIPT INCORPORADA:
+                # URL Conector oficial de tu Google Apps Script
                 url_google_script = "https://google.com"
                 
                 # 1. Enviar los datos en tiempo real de forma externa a Google Sheets
@@ -212,7 +214,7 @@ if not df_matriz.empty:
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadística:",
+                    "3.2 Nivel de Desagregación estadística / Desagregacion Est:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                 )
                 
@@ -222,9 +224,10 @@ if not df_matriz.empty:
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
                 
-                # Valores de contingencia automáticos para las columnas de la Sección 4 que se oculta
+                # 🔄 VINCULACIÓN CORREGIDA: "nombre Insu Carto" ahora tiene espacio físico en lugar de guion bajo
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
-                formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
+                formato_gis, otro_formato_gis, genera_info_georref, Cancer_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
+                otras_fuentes_gis = "No aplica"
 
             else:  # Caso: "Geográfica"
                 st.markdown("---")
@@ -237,7 +240,7 @@ if not df_matriz.empty:
                 )
                 
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
                     ["Sí", "No"],
                     key=f"genera_cart_{st.session_state.contador_guardado}"
                 )
