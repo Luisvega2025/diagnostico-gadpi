@@ -104,7 +104,6 @@ if not df_matriz.empty:
             key=f"correo_{st.session_state.contador_guardado}",
         )
         
-        # Guardamos el estado de la validación del correo institucional
         correo_valido = False
         if correo_ext:
             if correo_ext.strip().lower().endswith("@imbabura.gob.ec"):
@@ -302,7 +301,6 @@ if not df_matriz.empty:
                 "6.4 Destinatarios de la Información (si aplica):",
                 ["Otras Direcciones GADPI", "GADs Cantonales / Parroquiales", "Ministerios", "Público en general"],
             )
-
             st.markdown("---")
             st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
@@ -389,3 +387,19 @@ if not df_matriz.empty:
                             "Ruta/Enlace": ruta_archivo,
                             "Difunde Terceros": difunde_terceros,
                             "Destinatarios": ", ".join(destinatarios),
+                            "Frecuencia Act": frec_act,
+                            "Fecha Ultima Act": fecha_ultima,
+                            "Limitaciones": ", ".join(limitaciones),
+                            "Alineacion Planif": ", ".join(planificacion),
+                            "Ficha Metodologica": ficha_met,
+                            "Unidad Resp Cálculo": uni_resp_calcul,
+                            "Riesgos Preservacion": ", ".join(riesgos_preserv),
+                            "Uso Interno": uso_interno,
+                            "Integracion SIL": uso_sil,
+                            "Nivel Acceso": nivel_acceso,
+                            "URL Publicacion": url_publicacion,
+                            "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
+                        }
+                        guardar_datos_nube(reg)
+    except KeyError as e:
+        st.error(f"Error al acoplar las columnas: {columnas}")
