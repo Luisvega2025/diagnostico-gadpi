@@ -98,18 +98,12 @@ if not df_matriz.empty:
             placeholder="Nombres y Apellidos completos",
             key=f"tecnico_{st.session_state.contador_guardado}",
         )
-        
-        # 🔄 MODIFICACIÓN: Eliminada la validación restrictiva y cambiado el placeholder
         correo_ext = st.text_input(
             "1.4 Correo Institucional / Contacto:",
             placeholder="correo; celular",
             key=f"correo_{st.session_state.contador_guardado}",
         )
-        
-        # El correo siempre se considera válido para liberar el botón de inmediato
-        correo_valido = True
         st.markdown("---")
-        
         st.header("Sección 2: Producto e Insumo según Estatuto 2026")
         df_f_prod = df_f_sub[df_f_sub[col_sub] == sub_opcion]
         prod_opcion = st.selectbox(
@@ -150,7 +144,7 @@ if not df_matriz.empty:
                 import requests
                 import json
                 
-                # URL Conector oficial de tu Google Apps Script
+                # 🚀 TU URL DEFINITIVA DE GOOGLE APPS SCRIPT INCORPORADA:
                 url_google_script = "https://google.com"
                 
                 # 1. Enviar los datos en tiempo real de forma externa a Google Sheets
@@ -178,11 +172,8 @@ if not df_matriz.empty:
                 st.rerun()
             except Exception as e:
                 st.error(f"Error al enviar datos al sistema central: {e}")
-
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
-            
-            # El botón ya no se bloqueará porque correo_valido es siempre True
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
                 reg = {
                     "Direccion": dir_opcion,
@@ -221,7 +212,7 @@ if not df_matriz.empty:
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadística / Desagregacion Est:",
+                    "3.2 Nivel de Desagregación estadística:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                 )
                 
@@ -231,7 +222,7 @@ if not df_matriz.empty:
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
                 
-                # Valores automáticos de contingencia para la base de datos (Sección 4 oculta)
+                # Valores de contingencia automáticos para las columnas de la Sección 4 que se oculta
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
                 formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
 
@@ -246,7 +237,7 @@ if not df_matriz.empty:
                 )
                 
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
                     ["Sí", "No"],
                     key=f"genera_cart_{st.session_state.contador_guardado}"
                 )
@@ -298,7 +289,7 @@ if not df_matriz.empty:
                 # Valores por defecto para el bloque estadístico que se ocultó en este flujo
                 nombre_ins_estad, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
 
-            # El flujo alfanumérico salta directamente a la sección de fuentes
+            # El flujo unificado continúa directo hacia la Sección 5 (Fuentes)
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
@@ -344,7 +335,7 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
-                "7.1 Frecuencia de Actualización / Frecuencia Act:",
+                "7.1 Frecuencia de Actualización General / Frecuencia Act:",
                 ["Continuo", "Mensual", "Trimestral", "Semestral", "Anual", "Por demanda", "No se actualizan"],
             )
             fecha_ultima = st.text_input(
@@ -389,7 +380,7 @@ if not df_matriz.empty:
                 placeholder="Como puede aprovecharse la información",
                 key=f"usosil_{st.session_state.contador_guardado}",
             )
-            nivel_acceso = st.radio("8.3 Nivel de Acceso de la Información / Nivel Accesso:", ["Público", "Restringido", "Uso Interno únicamente"])
+            nivel_acceso = st.radio("8.3 Nivel de Acceso de la Información / Nivel Acceso:", ["Público", "Restringido", "Uso Interno únicamente"])
             url_publicacion = st.text_input(
                 "8.4 Plataforma / Enlace Web de Publicación (si aplica) / URL Publicacion:",
                 placeholder="URL pública del geoportal o visor web",
@@ -398,7 +389,6 @@ if not df_matriz.empty:
 
             st.markdown("---")
             
-            # Validación simplificada: Guarda directamente si el técnico escribió su nombre
             if st.button("💾 Guardar Ficha de Diagnóstico", type="primary"):
                 if not tecnico_resp:
                     st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
