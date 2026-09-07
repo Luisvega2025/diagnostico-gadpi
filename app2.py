@@ -152,7 +152,7 @@ if not df_matriz.empty:
                 import requests
                 import json
                 
-                # URL Conector oficial de tu Google Apps Script
+                # 🚀 TU URL DEFINITIVA DE GOOGLE APPS SCRIPT INCORPORADA DE FORMA FIJA:
                 url_google_script = "https://google.com"
                 
                 # 1. Enviar los datos en tiempo real de forma externa a Google Sheets
@@ -196,7 +196,7 @@ if not df_matriz.empty:
                         "Tecnico": tecnico_resp,
                         "Contacto": correo_ext,
                         "Producto": prod_opcion,
-                        "Aplica Info": "No",
+                        "Aplica Info": aplica_info,
                         "Tipo Informacion": tipo_informacion,
                         "nombre Ins Estad": "No aplica",
                         "Desagregacion Est": "No aplica",
@@ -220,7 +220,7 @@ if not df_matriz.empty:
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
                 
-                # 🔄 SINCRONIZADO: Nombre exacto de tu columna en Google Sheets
+                # Sincronizado textualmente con la columna de tu Google Sheet
                 nombre_ins_estad = st.text_input(
                     "3.1 ¿Nombre del insumo estadístico/alfanumérico que aporta a este producto?",
                     placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
@@ -228,7 +228,7 @@ if not df_matriz.empty:
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadística:",
+                    "3.2 Nivel de Desagregación estadística / Desagregacion Est:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                 )
                 
@@ -246,16 +246,16 @@ if not df_matriz.empty:
                 st.markdown("---")
                 st.header("Sección 4: Datos Geográficos (GIS)")
                 
-                # 🔄 SINCRONIZADO: Nombre exacto de tu columna en Google Sheets
+                # Sincronizado textualmente con la columna de tu Google Sheet
                 nombre_insu_carto = st.text_input(
                     "4.1 ¿Nombre del insumo cartográfico que aporta a este producto?",
                     placeholder="ejem: vias.shp/*nombre.mxd/nombre.gdb",
                     key=f"insumo_carto_{st.session_state.contador_guardado}"
                 )
                 
-                # 🔄 SINCRONIZADO: Pregunta corta asociada a 'genera cart'
+                # Sincronizado textualmente con la columna de tu Google Sheet
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
                     ["Sí", "No"],
                     key=f"genera_cart_{st.session_state.contador_guardado}"
                 )
@@ -311,25 +311,25 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
-                "5.1 Unidad de Medida del Dato / Indicador:",
+                "5.1 Unidad de Medida del Dato / Indicador / Unidad Medida:",
                 ["Kilómetros", "Hectáreas", "Porcentaje", "Número de usuarios", "Unidades", "No aplica"],
             )
             fuente_origen = st.selectbox(
-                "5.2 Fuente de Origen del Dato:",
+                "5.2 Fuente de Origen del Dato / Fuente Origen:",
                 ["Interno GADPI", "Entidad Externa", "Mixto"],
             )
             nombre_fuente = st.text_input(
-                "5.3 Nombre de la fuente/proveedor:",
+                "5.3 Nombre de la fuente/proveedor / Nombre Fuente:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"fuente_{st.session_state.contador_guardado}",
             )
             unidad_prov = st.text_input(
-                "5.4 Unidad / Dirección Interna Proveedora (si aplica):",
+                "5.4 Unidad / Dirección Interna Proveedora (si aplica) / Unidad Prov:",
                 placeholder="Nombre de la unidad interna proveedora",
                 key=f"unidadprov_{st.session_state.contador_guardado}",
             )
             inst_ext_prov = st.text_input(
-                "5.5 Institución Externa Proveedora (si aplica):",
+                "5.5 Institución Externa Proveedora (si aplica) / Inst Ext Prov:",
                 placeholder="Ejemplo: INEC, MAATE, MTOP, MAG, INAMHI",
                 key=f"instext_{st.session_state.contador_guardado}",
             )
@@ -337,17 +337,17 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 6: Medios de Verificación y Flujos")
             medio_verif = st.multiselect(
-                "6.1 Medio de Verificación Disponible:",
+                "6.1 Medio de Verificación Disponible / Medio Verificacion:",
                 ["Físico (Archivo)", "Digital (Servidor/PC)", "Base de Datos", "Sistema Web"],
             )
             ruta_archivo = st.text_input(
-                "6.2 Nombre de archivo, BD o Enlace del medio de verificación:",
+                "6.2 Nombre de archivo, BD o Enlace del medio de verificación / Ruta/Enlace:",
                 placeholder="Ruta de red, enlace a Google Drive o repositorio",
                 key=f"ruta_{st.session_state.contador_guardado}",
             )
-            difunde_terceros = st.radio("6.3 ¿Entrega o difunde este producto a terceros?", ["Sí", "No"])
+            difunde_terceros = st.radio("6.3 ¿Entrega o difunde este producto a terceros? / Difunde Terceros:", ["Sí", "No"])
             destinatarios = st.multiselect(
-                "6.4 Destinatarios de la Información (si aplica):",
+                "6.4 Destinatarios de la Información (si aplica) / Destinatarios:",
                 ["Otras Direcciones GADPI", "GADs Cantonales / Parroquiales", "Ministerios", "Público en general"],
             )
             st.markdown("---")
