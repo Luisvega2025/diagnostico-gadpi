@@ -214,7 +214,7 @@ if not df_matriz.empty:
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadística / Desagregacion Est:",
+                    "3.2 Nivel de Desagregación estadística:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                 )
                 
@@ -224,10 +224,9 @@ if not df_matriz.empty:
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
                 
-                # 🔄 VINCULACIÓN CORREGIDA: "nombre Insu Carto" ahora tiene espacio físico en lugar de guion bajo
+                # REPARACIÓN COMPLETA: Todas las llaves GIS se definen limpias y en "No aplica"
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
-                formato_gis, otro_formato_gis, genera_info_georref, Cancer_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
-                otras_fuentes_gis = "No aplica"
+                formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
 
             else:  # Caso: "Geográfica"
                 st.markdown("---")
@@ -240,7 +239,7 @@ if not df_matriz.empty:
                 )
                 
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
                     ["Sí", "No"],
                     key=f"genera_cart_{st.session_state.contador_guardado}"
                 )
@@ -338,7 +337,7 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
-                "7.1 Frecuencia de Actualización General / Frecuencia Act:",
+                "7.1 Frecuencia de Actualización / Frecuencia Act:",
                 ["Continuo", "Mensual", "Trimestral", "Semestral", "Anual", "Por demanda", "No se actualizan"],
             )
             fecha_ultima = st.text_input(
@@ -417,7 +416,7 @@ if not df_matriz.empty:
                         "Genera Info Georreferenciada": genera_info_georref,
                         "Otras Fuentes GIS": otras_fuentes_gis,
                         "Tiene Metadatos": tiene_metadatos,
-                        "Unidad Medida": unidad_medida,
+                        "Unidad Medida": unit_medida if 'unit_medida' in locals() else unidad_medida,
                         "Fuente Origen": fuente_origen,
                         "Nombre Fuente": nombre_fuente,
                         "Unidad Prov": unidad_prov,
