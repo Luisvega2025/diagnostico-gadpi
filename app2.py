@@ -28,7 +28,7 @@ if not df_matriz.empty:
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
 
-    # Conexión nativa oficial para lectura de la matriz
+    # Conexión para lectura de datos en tiempo real
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     # Control de estados para vaciar campos de texto tras guardar exitosamente
@@ -141,21 +141,18 @@ if not df_matriz.empty:
 
         st.info("ℹ️ **SI TIENE LOS DOS TIPOS DE INFORMACIÓN SE DEBE LLENAR UN REGISTRO A LA VEZ POR INSUMO (alfanumérico o Cartográfico)**")
 
-        # 🛠️ CONECTOR RECONSTRUIDO CON LA NUEVA URL DE TRANSMISIÓN DE SEGURIDAD
+        # 🛠️ CORRECCIÓN CRÍTICA EN EL PARAMETRO DE RED: CAMBIO A ENVÍO NATIVO JSON
         def guardar_datos_nube(registro_dicc):
             try:
                 import requests
-                import json
                 
-                # URL limpia y autorizada de tu Google Apps Script de hoy en la mañana
+                # URL limpia y autorizada de tu Google Apps Script
                 url_google_script = "https://google.com"
                 
-                # 1. Enviar los datos de forma externa a Google Sheets (Google los insertará desde adentro)
-                payload = json.dumps(registro_dicc)
-                headers = {'Content-Type': 'application/json'}
-                requests.post(url_google_script, data=payload, headers=headers, timeout=10)
+                # REPARACIÓN DE LA TUBERÍA: Se elimina string crudo y se envía como diccionario json nativo
+                requests.post(url_google_script, json=registro_dicc, timeout=10)
                 
-                # 2. Respaldo local de seguridad en el servidor
+                # 2. Respaldo local doble de seguridad en el servidor virtual
                 df_nuevo = pd.DataFrame([registro_dicc])
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
@@ -164,17 +161,17 @@ if not df_matriz.empty:
                     df_consolidado = df_nuevo
                 df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # 🎈 Animación de globos ascendentes al completar con éxito
+                # 🎈 Animación de globos ascendentes
                 st.balloons()
                 
                 import time
                 time.sleep(1.5)
                 
-                # Incrementa el contador para resetear y vaciar la pantalla
+                # Incrementa el contador para resetear y vaciar los campos de la interfaz
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error técnico al enviar los datos al canal central: {e}")
+                st.error(f"Error técnico al despachar los datos al canal central: {e}")
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
@@ -236,7 +233,7 @@ if not df_matriz.empty:
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadística / Desagregacion Est:",
+                    "3.2 Nivel de Desagregación estadística:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                 )
                 
@@ -261,7 +258,7 @@ if not df_matriz.empty:
                 )
                 
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
                     ["Sí", "No"],
                     key=f"genera_cart_{st.session_state.contador_guardado}"
                 )
@@ -298,11 +295,12 @@ if not df_matriz.empty:
                     key=f"genera_georref_{st.session_state.contador_guardado}"
                 )
                 
-                otras_fuentes_gis = st.text_input(
+                offset_fuentes_gis = st.text_input(
                     "4.9 ¿Obtiene de otras fuentes? Cuáles? / Otras Fuentes GIS:",
                     placeholder="ejem: IGM, INEC, MAG, etc",
                     key=f"otras_fuentes_{st.session_state.contador_guardado}"
                 )
+                otras_fuentes_gis = offset_fuentes_gis
                 
                 tiene_metadatos = st.text_input(
                     "4.10 ¿Tiene metadatos, catálogo de objetos? / Tiene Metadatos:",
@@ -417,7 +415,7 @@ if not df_matriz.empty:
                 if not tecnico_resp:
                     st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
                 else:
-                    # Diccionario ordenado en la misma secuencia matemática que tu hoja
+                    # Estructura corregida enviada mediante JSON nativo
                     reg = {
                         "Direccion": dir_opcion,
                         "Subunidad": sub_opcion,
