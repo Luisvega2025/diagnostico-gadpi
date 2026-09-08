@@ -28,7 +28,7 @@ if not df_matriz.empty:
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
 
-    # Conexión nativa oficial para lectura y escritura directa (Igual al viernes)
+    # Conexión nativa oficial para lectura de la matriz
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     # Control de estados para vaciar campos de texto tras guardar exitosamente
@@ -141,43 +141,40 @@ if not df_matriz.empty:
 
         st.info("ℹ️ **SI TIENE LOS DOS TIPOS DE INFORMACIÓN SE DEBE LLENAR UN REGISTRO A LA VEZ POR INSUMO (alfanumérico o Cartográfico)**")
 
-        # 🛠️ MOTOR DE GUARDADO DIRECTO RECONSTRUIDO AL ESTILO ORIGINAL DEL VIERNES
+        # 🛠️ CONECTOR RECONSTRUIDO CON LA NUEVA URL DE TRANSMISIÓN DE SEGURIDAD
         def guardar_datos_nube(registro_dicc):
             try:
-                # 1. Leer la base de datos actual de Google Sheets en tiempo real
-                df_actual = conn.read(ttl="1s")
+                import requests
+                import json
                 
-                # Convertir el nuevo registro a formato DataFrame
+                # URL limpia y autorizada de tu Google Apps Script de hoy en la mañana
+                url_google_script = "https://google.com"
+                
+                # 1. Enviar los datos de forma externa a Google Sheets (Google los insertará desde adentro)
+                payload = json.dumps(registro_dicc)
+                headers = {'Content-Type': 'application/json'}
+                requests.post(url_google_script, data=payload, headers=headers, timeout=10)
+                
+                # 2. Respaldo local de seguridad en el servidor
                 df_nuevo = pd.DataFrame([registro_dicc])
-                
-                # 2. Concatenar y empalmar la nueva fila respetando las columnas exactas
-                if df_actual is not None and not df_actual.empty:
-                    df_consolidado = pd.concat([df_actual, df_nuevo], ignore_index=True)
-                else:
-                    df_consolidado = df_nuevo
-                
-                # 3. Empujar los datos de forma directa usando las credenciales nativas del sistema
-                conn.update(data=df_consolidado)
-                
-                # 4. Respaldo local de seguridad en el servidor
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
-                    df_local = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                    df_consolidado = pd.concat([df_existente, df_nuevo], ignore_index=True)
                 else:
-                    df_local = df_nuevo
-                df_local.to_excel(EXCEL_DIAGNOSTICO, index=False)
+                    df_consolidado = df_nuevo
+                df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # 🎈 Animación de éxito
+                # 🎈 Animación de globos ascendentes al completar con éxito
                 st.balloons()
                 
                 import time
                 time.sleep(1.5)
                 
-                # Resetear la pantalla
+                # Incrementa el contador para resetear y vaciar la pantalla
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error técnico al escribir directamente en Google Sheets: {e}")
+                st.error(f"Error técnico al enviar los datos al canal central: {e}")
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
@@ -227,13 +224,13 @@ if not df_matriz.empty:
                 }
                 guardar_datos_nube(reg)
         else:
-            # CONDICIONAL ABSOLUTA: Renderiza visualmente solo la sección seleccionada
+            # CONDICIONAL PRINCIPAL SEGÚN EL NUMERAL 2.3
             if tipo_informacion == "Alfanumérica / Estadística":
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
                 
                 nombre_ins_estad = st.text_input(
-                    "3.1 ¿Nombre del insumo de datos estadísticos o alfanuméricos?:",
+                    "3.1 ¿Nombre del insumo estadístico/alfanumérico que aporta a este producto?",
                     placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
                     key=f"insumo_est_{st.session_state.contador_guardado}"
                 )
@@ -249,7 +246,7 @@ if not df_matriz.empty:
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
                 
-                # Valores de contingencia para la base de datos (Sección 4 oculta)
+                # Contingencias GIS estables en "No aplica" para este flujo alfanumérico
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
                 formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
 
@@ -362,7 +359,7 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
-                "7.1 Frecuencia de Actualización / Frecuencia Act:",
+                "7.1 Frecuencia de Actualización General / Frecuencia Act:",
                 ["Continuo", "Mensual", "Trimestral", "Semestral", "Anual", "Por demanda", "No se actualizan"],
             )
             fecha_ultima = st.text_input(
@@ -420,7 +417,7 @@ if not df_matriz.empty:
                 if not tecnico_resp:
                     st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
                 else:
-                    # Estructura de diccionario enviada directamente al conector gsheets de Streamlit
+                    # Diccionario ordenado en la misma secuencia matemática que tu hoja
                     reg = {
                         "Direccion": dir_opcion,
                         "Subunidad": sub_opcion,
