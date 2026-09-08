@@ -103,8 +103,6 @@ if not df_matriz.empty:
             placeholder="correo; celular",
             key=f"correo_{st.session_state.contador_guardado}",
         )
-        
-        correo_valido = True
         st.markdown("---")
         st.header("Sección 2: Producto e Insumo según Estatuto 2026")
         df_f_prod = df_f_sub[df_f_sub[col_sub] == sub_opcion]
@@ -122,7 +120,7 @@ if not df_matriz.empty:
                 and (df_check["Producto"].astype(str).str.strip().eq(str(prod_opcion).strip()).any())
             ):
                 st.info(
-                    "ℹ/️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
+                    "ℹ️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
                 )
         except:
             pass
@@ -198,11 +196,32 @@ if not df_matriz.empty:
                     "Genera Info Georreferenciada": "No aplica",
                     "Otras Fuentes GIS": "No aplica",
                     "Tiene Metadatos": "No aplica",
+                    "Unidad Medida": "No aplica",
+                    "Fuente Origen": "No aplica",
+                    "Nombre Fuente": "No aplica",
+                    "Unidad Prov": "No aplica",
+                    "Inst Ext Prov": "No aplica",
+                    "Medio Verificacion": "No aplica",
+                    "Ruta/Enlace": "No aplica",
+                    "Difunde Terceros": "No aplica",
+                    "Destinatarios": "No aplica",
+                    "Frecuencia Act": "No aplica",
+                    "Fecha Ultima Act": "No aplica",
+                    "Limitaciones": "No aplica",
+                    "Otra Razon Limitacion": "No aplica",
+                    "Alineacion Planif": "No aplica",
+                    "Ficha Metodologica": "No aplica",
+                    "Unidad Resp Calculo": "No aplica",
+                    "Riesgos Preservacion": "No aplica",
+                    "Uso Interno": "No aplica",
+                    "Integracion SIL": "No aplica",
+                    "Nivel Acceso": "No aplica",
+                    "URL Publicacion": "No aplica",
                     "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
                 }
                 guardar_datos_nube(reg)
         else:
-            # LÓGICA DE CONDICIONALES PARA MOSTRAR U OCULTAR SECCIONES SEGÚN PREGUNTA 2.3
+            # CONDICIONAL PRINCIPAL SEGÚN EL NUMERAL 2.3
             if tipo_informacion == "Alfanumérica / Estadística":
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
@@ -214,7 +233,7 @@ if not df_matriz.empty:
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadística:",
+                    "3.2 Nivel de Desagregación estadística / Desagregacion Est:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                 )
                 
@@ -224,7 +243,7 @@ if not df_matriz.empty:
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
                 
-                # 🛠️ CORRECCIÓN ABSOLUTA: Se definen limpias todas las llaves GIS en "No aplica"
+                # Contingencias GIS estables en "No aplica" para este flujo alfanumérico
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
                 formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
 
@@ -239,7 +258,7 @@ if not df_matriz.empty:
                 )
                 
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
                     ["Sí", "No"],
                     key=f"genera_cart_{st.session_state.contador_guardado}"
                 )
@@ -291,7 +310,7 @@ if not df_matriz.empty:
                 # Valores por defecto para el bloque estadístico que se ocultó en este flujo
                 nombre_ins_estad, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
 
-            # El flujo unificado continúa directo hacia la Sección 5 (Fuentes)
+            # El flujo alfanumérico salta linealmente aquí (Sección 5)
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
@@ -395,6 +414,7 @@ if not df_matriz.empty:
                 if not tecnico_resp:
                     st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
                 else:
+                    # 🔄 ORDENAMIENTO EN SECUENCIA MATEMÁTICA EXACTA CON TU GOOGLE SHEET REAL
                     reg = {
                         "Direccion": dir_opcion,
                         "Subunidad": sub_opcion,
