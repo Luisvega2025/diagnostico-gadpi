@@ -103,6 +103,8 @@ if not df_matriz.empty:
             placeholder="correo; celular",
             key=f"correo_{st.session_state.contador_guardado}",
         )
+        
+        correo_valido = True
         st.markdown("---")
         st.header("Sección 2: Producto e Insumo según Estatuto 2026")
         df_f_prod = df_f_sub[df_f_sub[col_sub] == sub_opcion]
@@ -144,7 +146,7 @@ if not df_matriz.empty:
                 import requests
                 import json
                 
-                # URL Conector oficial de tu Google Apps Script
+                # 🚀 TU NUEVA URL LIMPIA DE GOOGLE APPS SCRIPT INCORPORADA DE FORMA FIJA:
                 url_google_script = "https://google.com"
                 
                 # 1. Enviar los datos en tiempo real de forma externa a Google Sheets
@@ -221,7 +223,7 @@ if not df_matriz.empty:
                 }
                 guardar_datos_nube(reg)
         else:
-            # CONDICIONAL PRINCIPAL SEGÚN EL NUMERAL 2.3
+            # 🛠️ CONDICIONAL DE FLUJO CORREGIDA: Separa estrictamente la renderización visual de los títulos
             if tipo_informacion == "Alfanumérica / Estadística":
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
@@ -233,7 +235,7 @@ if not df_matriz.empty:
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadística / Desagregacion Est:",
+                    "3.2 Nivel de Desagregación estadística:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                 )
                 
@@ -243,7 +245,7 @@ if not df_matriz.empty:
                     key=f"cobertura_{st.session_state.contador_guardado}",
                 )
                 
-                # Contingencias GIS estables en "No aplica" para este flujo alfanumérico
+                # Valores estables de contingencia para las columnas GIS del mismo registro
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
                 formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
 
@@ -258,7 +260,7 @@ if not df_matriz.empty:
                 )
                 
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
                     ["Sí", "No"],
                     key=f"genera_cart_{st.session_state.contador_guardado}"
                 )
@@ -310,7 +312,7 @@ if not df_matriz.empty:
                 # Valores por defecto para el bloque estadístico que se ocultó en este flujo
                 nombre_ins_estad, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
 
-            # El flujo alfanumérico salta linealmente aquí (Sección 5)
+            # El flujo unificado continúa directo hacia la Sección 5 (Fuentes)
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             unidad_medida = st.selectbox(
@@ -414,7 +416,6 @@ if not df_matriz.empty:
                 if not tecnico_resp:
                     st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
                 else:
-                    # 🔄 ORDENAMIENTO EN SECUENCIA MATEMÁTICA EXACTA CON TU GOOGLE SHEET REAL
                     reg = {
                         "Direccion": dir_opcion,
                         "Subunidad": sub_opcion,
