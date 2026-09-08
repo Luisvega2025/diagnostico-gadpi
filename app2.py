@@ -141,18 +141,17 @@ if not df_matriz.empty:
 
         st.info("ℹ️ **SI TIENE LOS DOS TIPOS DE INFORMACIÓN SE DEBE LLENAR UN REGISTRO A LA VEZ POR INSUMO (alfanumérico o Cartográfico)**")
 
-        # 🛠️ CORRECCIÓN CRÍTICA EN EL PARAMETRO DE RED: CAMBIO A ENVÍO NATIVO JSON
         def guardar_datos_nube(registro_dicc):
             try:
                 import requests
                 
-                # URL limpia y autorizada de tu Google Apps Script
+                # 🚀 TU URL TOTALMENTE NUEVA Y VIRGEN ASOCIADA A LA HOJA LIMPIA:
                 url_google_script = "https://google.com"
                 
-                # REPARACIÓN DE LA TUBERÍA: Se elimina string crudo y se envía como diccionario json nativo
+                # Despacho nativo de diccionario estruturado directo a la API de Drive
                 requests.post(url_google_script, json=registro_dicc, timeout=10)
                 
-                # 2. Respaldo local doble de seguridad en el servidor virtual
+                # Respaldo local de contingencia en el servidor
                 df_nuevo = pd.DataFrame([registro_dicc])
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
@@ -161,17 +160,17 @@ if not df_matriz.empty:
                     df_consolidado = df_nuevo
                 df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # 🎈 Animación de globos ascendentes
+                # 🎈 Animación de globos ascendentes al completar con éxito
                 st.balloons()
                 
                 import time
                 time.sleep(1.5)
                 
-                # Incrementa el contador para resetear y vaciar los campos de la interfaz
+                # Incrementa el contador para resetear y vaciar la pantalla
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error técnico al despachar los datos al canal central: {e}")
+                st.error(f"Error técnico al enviar los datos al canal central: {e}")
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
@@ -221,7 +220,7 @@ if not df_matriz.empty:
                 }
                 guardar_datos_nube(reg)
         else:
-            # CONDICIONAL PRINCIPAL SEGÚN EL NUMERAL 2.3
+            # CONDICIONAL DE FLUJO SEGÚN EL NUMERAL 2.3
             if tipo_informacion == "Alfanumérica / Estadística":
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
@@ -295,12 +294,11 @@ if not df_matriz.empty:
                     key=f"genera_georref_{st.session_state.contador_guardado}"
                 )
                 
-                offset_fuentes_gis = st.text_input(
+                otras_fuentes_gis = st.text_input(
                     "4.9 ¿Obtiene de otras fuentes? Cuáles? / Otras Fuentes GIS:",
                     placeholder="ejem: IGM, INEC, MAG, etc",
                     key=f"otras_fuentes_{st.session_state.contador_guardado}"
                 )
-                otras_fuentes_gis = offset_fuentes_gis
                 
                 tiene_metadatos = st.text_input(
                     "4.10 ¿Tiene metadatos, catálogo de objetos? / Tiene Metadatos:",
@@ -415,7 +413,6 @@ if not df_matriz.empty:
                 if not tecnico_resp:
                     st.warning("Complete el Nombre del Técnico Responsable en la Sección 1.")
                 else:
-                    # Estructura corregida enviada mediante JSON nativo
                     reg = {
                         "Direccion": dir_opcion,
                         "Subunidad": sub_opcion,
