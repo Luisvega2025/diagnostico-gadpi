@@ -28,7 +28,7 @@ if not df_matriz.empty:
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
 
-    # Conexión nativa oficial para lectura de la matriz limpia
+    # 🤝 CONEXIÓN DIRECTA NATIVA DE RESPALDO DE GOOGLE SHEETS
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     # Control de estados para vaciar campos de texto tras guardar exitosamente
@@ -141,36 +141,227 @@ if not df_matriz.empty:
 
         st.info("ℹ️ **SI TIENE LOS DOS TIPOS DE INFORMACIÓN SE DEBE LLENAR UN REGISTRO A LA VEZ POR INSUMO (alfanumérico o Cartográfico)**")
 
+        # 🛠️ SISTEMA DE INYECCIÓN NATIVA DIRECTA (SIN DEPENDER DE APPS SCRIPT)
         def guardar_datos_nube(registro_dicc):
             try:
-                import requests
+                # 1. Leer en tiempo real el contenido actual de tu Google Sheet
+                df_actual = conn.read(worksheet="Hoja1", ttl="1s")
                 
-                # URL limpia y autorizada de tu nuevo Google Apps Script
-                url_google_script = "https://google.com"
-                
-                # Despacho nativo de diccionario estructurado directo a la API de Drive
-                requests.post(url_google_script, json=registro_dicc, timeout=10)
-                
-                # Respaldo local de contingencia en el servidor
+                # Convertir el registro nuevo en una fila de DataFrame
                 df_nuevo = pd.DataFrame([registro_dicc])
-                if os.path.exists(EXCEL_DIAGNOSTICO):
-                    df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
-                    df_consolidado = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                
+                # 2. Concatenar y anexar la nueva fila de forma segura
+                if df_actual is not None and not df_actual.empty:
+                    df_consolidado = pd.concat([df_actual, df_nuevo], ignore_index=True)
                 else:
                     df_consolidado = df_nuevo
-                df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # 🎈 Animación de globos ascendentes al completar con éxito
+                # 3. Forzar la escritura directa usando la API oficial nativa de Streamlit
+                conn.update(worksheet="Hoja1", data=df_consolidado)
+                
+                # 4. Respaldo local de seguridad en el servidor virtual
+                if os.path.exists(EXCEL_DIAGNOSTICO):
+                    df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
+                    df_local = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                else:
+                    df_local = df_nuevo
+                df_local.to_excel(EXCEL_DIAGNOSTICO, index=False)
+                
+                # 🎈 Éxito y animación en pantalla
                 st.balloons()
                 
                 import time
                 time.sleep(1.5)
                 
-                # Incrementa el contador para resetear y vaciar la pantalla
+                # Resetear la pantalla y campos de texto
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error técnico al enviar los datos al canal central: {e}")
+                st.error(f"Error al escribir directamente en el almacenamiento de Google Sheets: {e}")
+        if aplica_info == "No":
+            st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
+            if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
+                reg = {
+                    "Direccion": dir_opcion,
+                    "Subunidad": sub_opcion,
+                    "Tecnico": tecnico_resp,
+                    "Contacto": correo_ext,
+                    "Producto": prod_opcion,
+                    "Aplica Info": aplica_info,
+                    "Tipo Informacion": tipo_informacion,
+                    "nombre Ins Estad": "No aplica",
+                    "Desagregacion Est": "No aplica",
+                    "Cobertura Temporal": "No aplica",
+                    "nombre Insu Carto": "No aplica",
+                    "genera cart": "No aplica",
+                    "Desagregacion GIS": "No aplica",
+                    "Anio GIS": "No aplica",
+                    "Escala GIS": "No aplica",
+                    "Formato GIS": "No aplica",
+                    "Otro Formato GIS": "No aplica",
+                    "Genera Info Georreferenciada": "No aplica",
+                    "Otras Fuentes GIS": "No aplica",
+                    "Tiene Metadatos": "No aplica",
+                    "Unidad Medida": "No aplica",
+                    "Fuente Origen": "No aplica",
+                    "Nombre Fuente": "No aplica",
+                    "Unidad Prov": "No aplica",
+                    "Inst Ext Prov": "No aplica",
+                    "Medio Verificacion": "No aplica",
+                    "Ruta/Enlace": "No aplica",
+                    "Difunde Terceros": "No aplica",
+                    "Destinatarios": "No aplica",
+                    "Frecuencia Act": "No aplica",
+                    "Fecha Ultima Act": "No aplica",
+                    "Limitaciones": "No aplica",
+                    "Otra Razon Limitacion": "No aplica",
+                    "Alineacion Planif": "No aplica",
+                    "Ficha Metodologica": "No aplica",
+                    "Unidad Resp Calculo": "No aplica",
+                    "Riesgos Preservacion": "No aplica",
+                    "Uso Interno": "No aplica",
+                    "Integracion SIL": "No aplica",
+                    "Nivel Acceso": "No aplica",
+                    "URL Publicacion": "No aplica",
+                    "Fecha de Registro": pd.Timestamp.now().strftime("%Y/%m/%d"),
+                }
+                guardar_datos_nube(reg)
+        else:
+            # CONDICIONAL PRINCIPAL SEGÚN EL NUMERAL 2.3
+            if tipo_informacion == "Alfanumérica / Estadística":
+                st.markdown("---")
+                st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
+                
+                nombre_ins_estad = st.text_input(
+                    "3.1 ¿Nombre del insumo estadístico/alfanumérico que aporta a este producto?",
+                    placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
+                    key=f"insumo_est_{st.session_state.contador_guardado}"
+                )
+                
+                desag_est = st.multiselect(
+                    "3.2 Nivel de Desagregación estadística:",
+                    ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
+                )
+                
+                cobertura_est = st.text_input(
+                    "3.3 Temporalidad de Datos Estadísticos / Cobertura Temporal:",
+                    placeholder="Ejemplo: 2018 - 2026",
+                    key=f"cobertura_{st.session_state.contador_guardado}",
+                )
+                
+                # Contingencias GIS estables en "No aplica" para este flujo alfanumérico
+                nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
+                formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
+                unidad_medida = "No aplica"
+
+            else:  # Caso: "Geográfica"
+                st.markdown("---")
+                st.header("Sección 4: Datos Geográficos (GIS)")
+                
+                nombre_insu_carto = st.text_input(
+                    "4.1 ¿Nombre del insumo cartográfico que aporta a este producto?",
+                    placeholder="ejem: vias.shp/*nombre.mxd/nombre.gdb",
+                    key=f"insumo_carto_{st.session_state.contador_guardado}"
+                )
+                
+                genera_cart = st.radio(
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
+                    ["Sí", "No"],
+                    key=f"genera_cart_{st.session_state.contador_guardado}"
+                )
+                
+                desag_gis = st.multiselect(
+                    "4.3 Nivel de Desagregación Geográfica / Desagregacion GIS:",
+                    ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
+                )
+                
+                anio_gis = st.text_input(
+                    "4.4 Año de Datos Geográficos / Anio GIS:",
+                    placeholder="Ejemplo: 2020 - 2026",
+                    key=f"aniogis_{st.session_state.contador_guardado}",
+                )
+                
+                escala_gis = st.selectbox(
+                    "4.5 Escala de la cartografía / Escala GIS:",
+                    ["1:5.000", "1:25.000", "1:50.000", "1:100.000", "No"],
+                )
+                
+                formato_gis = st.multiselect(
+                    "4.6 Formato de Datos Geográficos Disponibles / Formato GIS:",
+                    ["File Geodatabase (.gdb)", "Shapefile (.shp)", "GeoJSON / KML", "Tabla XY (Excel / CSV)", "Servicio Web (WMS/WFS)"],
+                )
+                
+                otro_formato_gis = st.text_input(
+                    "4.7 ¿Otro formato? / Otro Formato GIS:",
+                    key=f"otro_formato_{st.session_state.contador_guardado}"
+                )
+                
+                genera_info_georref = st.text_input(
+                    "4.8 ¿Genera información georreferenciada - Cartografía? / Genera Info Georreferenciada:",
+                    placeholder="ejem: si, archivo shp, maps mxd, etc",
+                    key=f"genera_georref_{st.session_state.contador_guardado}"
+                )
+                
+                otras_fuentes_gis = st.text_input(
+                    "4.9 ¿Obtiene de otras fuentes? Cuáles? / Otras Fuentes GIS:",
+                    placeholder="ejem: IGM, INEC, MAG, etc",
+                    key=f"otras_fuentes_{st.session_state.contador_guardado}"
+                )
+                
+                tiene_metadatos = st.text_input(
+                    "4.10 ¿Tiene metadatos, catálogo de objetos? / Tiene Metadatos:",
+                    placeholder="si/no",
+                    key=f"metadatos_{st.session_state.contador_guardado}"
+                )
+                
+                # Valores por defecto para el bloque estadístico que se ocultó en este flujo
+                nombre_ins_estad, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
+                unidad_medida = "No aplica"
+
+            # El flujo unificado continúa directo hacia la Sección 5 (Fuentes)
+            st.markdown("---")
+            st.header("Sección 5: Fuentes y Origen del Dato")
+            if tipo_informacion == "Alfanumérica / Estadística":
+                unidad_medida = st.selectbox(
+                    "5.1 Unidad de Medida del Dato / Indicador / Unidad Medida:",
+                    ["Kilómetros", "Hectáreas", "Porcentaje", "Número de usuarios", "Unidades", "No aplica"],
+                )
+            fuente_origen = st.selectbox(
+                "5.2 Fuente de Origen del Dato / Fuente Origen:",
+                ["Interno GADPI", "Entidad Externa", "Mixto"],
+            )
+            nombre_fuente = st.text_input(
+                "5.3 Nombre de la fuente/proveedor / Nombre Fuente:",
+                placeholder="Nombre del sistema, censo, catastro o plataforma",
+                key=f"fuente_{st.session_state.contador_guardado}",
+            )
+            unidad_prov = st.text_input(
+                "5.4 Unidad / Dirección Interna Proveedora (si aplica) / Unidad Prov:",
+                placeholder="Nombre de la unidad interna proveedora",
+                key=f"unidadprov_{st.session_state.contador_guardado}",
+            )
+            inst_ext_prov = st.text_input(
+                "5.5 Institución Externa Proveedora (si aplica) / Inst Ext Prov:",
+                placeholder="Ejemplo: INEC, MAATE, MTOP, MAG, INAMHI",
+                key=f"instext_{st.session_state.contador_guardado}",
+            )
+
+            st.markdown("---")
+            st.header("Sección 6: Medios de Verificación y Flujos")
+            medio_verif = st.multiselect(
+                "6.1 Medio de Verificación Disponible / Medio Verificacion:",
+                ["Físico (Archivo)", "Digital (Servidor/PC)", "Base de Datos", "Sistema Web"],
+            )
+            ruta_archivo = st.text_input(
+                "6.2 Nombre de archivo, BD o Enlace del medio de verificación / Ruta/Enlace:",
+                placeholder="Ruta de red, enlace a Google Drive o repositorio",
+                key=f"ruta_{st.session_state.contador_guardado}",
+            )
+            difunde_terceros = st.radio("6.3 ¿Entrega o difunde este producto a terceros? / Difunde Terceros:", ["Sí", "No"])
+            destinatarios = st.multiselect(
+                "6.4 Destinatarios de la Información (si aplica) / Destinatarios:",
+                ["Otras Direcciones GADPI", "GADs Cantonales / Parroquiales", "Ministerios", "Público en general"],
+            )
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
@@ -448,7 +639,7 @@ if not df_matriz.empty:
                         "Destinatarios": ", ".join(destinatarios) if isinstance(destinatarios, list) else destinatarios,
                         "Frecuencia Act": frec_act,
                         "Fecha Ultima Act": fecha_ultima,
-                        "Limitaciones": ", ".join(limitaciones) if isinstance(limitaciones, list) else limitations,
+                        "Limitaciones": ", ".join(limitaciones) if isinstance(limitaciones, list) else limitaciones,
                         "Otra Razon Limitacion": otra_razon_limitacion,
                         "Alineacion Planif": ", ".join(planificacion) if isinstance(planificacion, list) else planificacion,
                         "Ficha Metodologica": ficha_met,
