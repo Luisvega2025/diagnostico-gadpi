@@ -28,7 +28,7 @@ if not df_matriz.empty:
         page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
     )
 
-    # Conexión para lectura de datos en tiempo real
+    # Conexión nativa oficial para lectura de la matriz limpia
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     # Control de estados para vaciar campos de texto tras guardar exitosamente
@@ -148,7 +148,7 @@ if not df_matriz.empty:
                 # 🚀 TU URL TOTALMENTE NUEVA Y VIRGEN ASOCIADA A LA HOJA LIMPIA:
                 url_google_script = "https://google.com"
                 
-                # Despacho nativo de diccionario estruturado directo a la API de Drive
+                # Despacho nativo de diccionario estructurado directo a la API de Drive
                 requests.post(url_google_script, json=registro_dicc, timeout=10)
                 
                 # Respaldo local de contingencia en el servidor
@@ -434,7 +434,7 @@ if not df_matriz.empty:
                         "Genera Info Georreferenciada": genera_info_georref,
                         "Otras Fuentes GIS": otras_fuentes_gis,
                         "Tiene Metadatos": tiene_metadatos,
-                        "Unidad Medida": unidad_medida,
+                        "Unidad Medida": ... if 'unidad_medida' not in locals() else unidad_medida,
                         "Fuente Origen": fuente_origen,
                         "Nombre Fuente": nombre_fuente,
                         "Unidad Prov": unidad_prov,
