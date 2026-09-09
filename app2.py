@@ -3,14 +3,13 @@ import pandas as pd
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 
-# DEFINICIÓN DE ARCHIVOS INSTITUCIONALES DEL SIL
 EXCEL_MATRIZ = "matriz_gad.xlsx"
 EXCEL_DIAGNOSTICO = "diagnostico_sil_gadpi_2026.xlsx"
 
 @st.cache_data
 def cargar_matriz_limpia():
     if not os.path.exists(EXCEL_MATRIZ):
-        st.error(f"No se encontró el archivo '{EXCEL_MATRIZ}'.")
+        st.error(f"No se encontro el archivo '{EXCEL_MATRIZ}'.")
         return pd.DataFrame()
     df = pd.read_excel(EXCEL_MATRIZ, header=0)
     df.columns = df.columns.astype(str).str.strip()
@@ -25,30 +24,27 @@ df_matriz = cargar_matriz_limpia()
 
 if not df_matriz.empty:
     st.set_page_config(
-        page_title="Ficha Diagnóstico GADPI - SIL", layout="centered"
+        page_title="Ficha Diagnostico GADPI - SIL", layout="centered"
     )
 
-    # Conexión nativa oficial para lectura de la matriz limpia
     conn = st.connection("gsheets", type=GSheetsConnection)
 
-    # Control de estados para vaciar campos de texto tras guardar exitosamente
     if "contador_guardado" not in st.session_state:
         st.session_state.contador_guardado = 0
 
     st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN Y COOPERACIÓN")
-    st.title("🏛️ Diagnóstico de Gestión de Información - GADPI")
+    st.title("🏛️ Diagnorstico de Gestion de Informacion - GADPI")
     st.write(
-        "Ficha técnica oficial para el levantamiento de información, bases de datos y productos del SIL Geo-Imbabura."
+        "Ficha tecnica oficial para el levantamiento de informacion, bases de datos y productos del SIL Geo-Imbabura."
     )
     st.info(
-        "✉️ **¿Preguntas o información adicional?** lvega@imbabura.gob.ec"
+        "✉️ **¿Preguntas o informacion adicional?** lvega@imbabura.gob.ec"
     )
 
     st.markdown("---")
 
-    # 🔐 SECCIÓN PRIVADA DE ADMINISTRACIÓN CON CONTRASEÑA
     with st.sidebar:
-        st.subheader("🔑 Acceso Administrator SIL")
+        st.subheader("🔑 Acceso Administrador SIL")
         clave_admin = st.text_input(
             "Ingrese la clave para descargar la base de datos:", type="password"
         )
@@ -74,7 +70,7 @@ if not df_matriz.empty:
             except Exception as e:
                 st.sidebar.error(f"Error al procesar el archivo: {e}")
         else:
-            st.sidebar.info("Aún no se registran fichas técnicas en la nube.")
+            st.sidebar.info("Aun no se registran fichas tecnicas en la nube.")
 
     columnas = list(df_matriz.columns)
     col_dir = next((c for c in columnas if "dir" in c.lower()), "Direccion")
@@ -82,19 +78,19 @@ if not df_matriz.empty:
     col_prod = next((c for c in columnas if "prod" in c.lower() or "est" in c.lower()), "Producto")
 
     try:
-        st.header("Sección 1: Identificación del Informante")
+        st.header("Seccion 1: Identificacion del Informante")
         dir_opcion = st.selectbox(
-            "1.1 Dirección General / Área Sustantiva:",
+            "1.1 Direccion General / Area Sustantiva:",
             sorted(df_matriz[col_dir].dropna().unique()),
         )
         df_f_sub = df_matriz[df_matriz[col_dir] == dir_opcion]
         sub_opcion = st.selectbox(
-            "1.2 Subdirección / Jefatura / Unidad Orgánica:",
+            "1.2 Subdireccion / Jefatura / Unidad Organica:",
             sorted(df_f_sub[col_sub].dropna().unique()),
         )
 
         tecnico_resp = st.text_input(
-            "1.3 Nombre del Técnico Responsable del Llenado:",
+            "1.3 Nombre del Tecnico Responsable del Llenado:",
             placeholder="Nombres y Apellidos completos",
             key=f"tecnico_{st.session_state.contador_guardado}",
         )
@@ -113,9 +109,8 @@ if not df_matriz.empty:
             sorted(df_f_prod[col_prod].dropna().unique()),
         )
 
-        # Alerta Informativa leyendo directamente de Google Sheets para control de duplicados
         try:
-            df_check = conn.read(ttl="5s")
+            df_check = conn.read(worksheet="Hoja1", ttl="5s")
             if (
                 not df_check.empty
                 and "Producto" in df_check.columns
@@ -143,34 +138,34 @@ if not df_matriz.empty:
 
         def guardar_datos_nube(registro_dicc):
             try:
-                import requests
-                
-                # URL limpia y autorizada de tu nuevo Google Apps Script
-                url_google_script = "https://google.com"
-                
-                # Despacho nativo de diccionario estructurado directo a la API de Drive
-                requests.post(url_google_script, json=registro_dicc, timeout=10)
-                
-                # Respaldo local de contingencia en el servidor
+                df_actual = conn.read(worksheet="Hoja1", ttl="1s")
                 df_nuevo = pd.DataFrame([registro_dicc])
-                if os.path.exists(EXCEL_DIAGNOSTICO):
-                    df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
-                    df_consolidado = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                
+                if df_actual is not None and not df_actual.empty:
+                    for col in df_actual.columns:
+                        if col in df_nuevo.columns:
+                            df_nuevo[col] = df_nuevo[col].astype(df_actual[col].dtype, errors='ignore')
+                    df_consolidado = pd.concat([df_actual, df_nuevo], ignore_index=True)
                 else:
                     df_consolidado = df_nuevo
-                df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
-                # 🎈 Animación de globos ascendentes al completar con éxito
+                conn.update(worksheet="Hoja1", data=df_consolidado)
+                
+                if os.path.exists(EXCEL_DIAGNOSTICO):
+                    df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
+                    df_local = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                else:
+                    df_local = df_nuevo
+                df_local.to_excel(EXCEL_DIAGNOSTICO, index=False)
+                
                 st.balloons()
-                
                 import time
                 time.sleep(1.5)
                 
-                # Incrementa el contador para resetear y vaciar la pantalla
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error técnico al enviar los datos al canal central: {e}")
+                st.error(f"Error al escribir directamente en la Hoja1 de Google Sheets: {e}")
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
@@ -220,7 +215,6 @@ if not df_matriz.empty:
                 }
                 guardar_datos_nube(reg)
         else:
-            # CONDICIONAL PRINCIPAL SEGÚN EL NUMERAL 2.3
             if tipo_informacion == "Alfanumérica / Estadística":
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
@@ -243,11 +237,10 @@ if not df_matriz.empty:
                     key=f"cobertura_v3_{st.session_state.contador_guardado}",
                 )
                 
-                # Contingencias GIS estables en "No aplica" para este flujo alfanumérico
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
                 formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
 
-            else:  # Caso: "Geográfica"
+            else:
                 st.markdown("---")
                 st.header("Sección 4: Datos Geográficos (GIS)")
                 
@@ -298,11 +291,12 @@ if not df_matriz.empty:
                     key=f"genera_georref_v3_{st.session_state.contador_guardado}"
                 )
                 
-                otras_fuentes_gis = st.text_input(
+                oras_fuentes_gis = st.text_input(
                     "4.9 ¿Obtiene de otras fuentes? Cuáles? / Otras Fuentes GIS:",
                     placeholder="ejem: IGM, INEC, MAG, etc",
                     key=f"otras_fuentes_v3_{st.session_state.contador_guardado}"
                 )
+                otras_fuentes_gis = oras_fuentes_gis
                 
                 tiene_metadatos = st.text_input(
                     "4.10 ¿Tiene metadatos, catálogo de objetos? / Tiene Metadatos:",
@@ -310,9 +304,7 @@ if not df_matriz.empty:
                     key=f"metadatos_v3_{st.session_state.contador_guardado}"
                 )
                 
-                # Valores por defecto para el bloque estadístico que se ocultó en este flujo
                 nombre_ins_estad, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
-            # El flujo unificado continúa directo hacia la Sección 5 (Fuentes)
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             
