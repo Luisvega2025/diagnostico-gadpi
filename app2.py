@@ -142,6 +142,7 @@ if not df_matriz.empty:
                 df_nuevo = pd.DataFrame([registro_dicc])
                 
                 if df_actual is not None and not df_actual.empty:
+                    df_nuevo = df_nuevo.reindex(columns=df_actual.columns, fill_value="No aplica")
                     df_consolidado = pd.concat([df_actual, df_nuevo], ignore_index=True)
                 else:
                     df_consolidado = df_nuevo
@@ -217,13 +218,13 @@ if not df_matriz.empty:
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
                 
                 nombre_ins_estad = st.text_input(
-                    "3.1 ¿Nombre del insumo estadístico/alfanumérico que aporta a este producto?",
+                    "3.1 ¿Nombre del insumo de información estadística / alfanumérica que aporta a este producto? / nombre Ins Estad:",
                     placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
                     key=f"insumo_est_v3_{st.session_state.contador_guardado}"
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Nivel de Desagregación estadística:",
+                    "3.2 Seleccione el nivel de desagregación de la información estadística / Desagregacion Est:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                     key=f"desag_est_v3_{st.session_state.contador_guardado}"
                 )
@@ -242,19 +243,19 @@ if not df_matriz.empty:
                 st.header("Sección 4: Datos Geográficos (GIS)")
                 
                 nombre_insu_carto = st.text_input(
-                    "4.1 ¿Nombre del insumo cartográfico que aporta a este producto?",
+                    "4.1 ¿Nombre del insumo de información cartográfica que aporta a este producto? / nombre Insu Carto:",
                     placeholder="ejem: vias.shp/*nombre.mxd/nombre.gdb",
                     key=f"insumo_carto_v3_{st.session_state.contador_guardado}"
                 )
                 
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)?", 
+                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
                     ["Sí", "No"],
                     key=f"genera_cart_v3_{st.session_state.contador_guardado}"
                 )
                 
                 desag_gis = st.multiselect(
-                    "4.3 Nivel de Desagregación Geográfica / Desagregacion GIS:",
+                    "4.3 Seleccione el nivel de desagregación de la información Geográfica / Desagregacion GIS:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                     key=f"desag_gis_v3_{st.session_state.contador_guardado}"
                 )
