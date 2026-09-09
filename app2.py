@@ -145,7 +145,7 @@ if not df_matriz.empty:
             try:
                 import requests
                 
-                # 🚀 TU URL TOTALMENTE NUEVA Y VIRGEN ASOCIADA A LA HOJA LIMPIA:
+                # URL limpia y autorizada de tu nuevo Google Apps Script
                 url_google_script = "https://google.com"
                 
                 # Despacho nativo de diccionario estructurado directo a la API de Drive
@@ -220,7 +220,7 @@ if not df_matriz.empty:
                 }
                 guardar_datos_nube(reg)
         else:
-            # CONDICIONAL DE FLUJO SEGÚN EL NUMERAL 2.3
+            # CONDICIONAL PRINCIPAL SEGÚN EL NUMERAL 2.3
             if tipo_informacion == "Alfanumérica / Estadística":
                 st.markdown("---")
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
@@ -245,6 +245,7 @@ if not df_matriz.empty:
                 # Contingencias GIS estables en "No aplica" para este flujo alfanumérico
                 nombre_insu_carto, genera_cart, desag_gis, anio_gis, escala_gis = "No aplica", "No aplica", ["No aplica"], "No aplica", "No aplica"
                 formato_gis, otro_formato_gis, genera_info_georref, otras_fuentes_gis, tiene_metadatos = ["No aplica"], "No aplica", "No aplica", "No aplica", "No aplica"
+                unidad_medida = "No aplica"
 
             else:  # Caso: "Geográfica"
                 st.markdown("---")
@@ -308,14 +309,16 @@ if not df_matriz.empty:
                 
                 # Valores por defecto para el bloque estadístico que se ocultó en este flujo
                 nombre_ins_estad, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
+                unidad_medida = "No aplica"
 
             # El flujo unificado continúa directo hacia la Sección 5 (Fuentes)
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
-            unidad_medida = st.selectbox(
-                "5.1 Unidad de Medida del Dato / Indicador / Unidad Medida:",
-                ["Kilómetros", "Hectáreas", "Porcentaje", "Número de usuarios", "Unidades", "No aplica"],
-            )
+            if tipo_informacion == "Alfanumérica / Estadística":
+                unidad_medida = st.selectbox(
+                    "5.1 Unidad de Medida del Dato / Indicador / Unidad Medida:",
+                    ["Kilómetros", "Hectáreas", "Porcentaje", "Número de usuarios", "Unidades", "No aplica"],
+                )
             fuente_origen = st.selectbox(
                 "5.2 Fuente de Origen del Dato / Fuente Origen:",
                 ["Interno GADPI", "Entidad Externa", "Mixto"],
@@ -352,7 +355,7 @@ if not df_matriz.empty:
                 "6.4 Destinatarios de la Información (si aplica) / Destinatarios:",
                 ["Otras Direcciones GADPI", "GADs Cantonales / Parroquiales", "Ministerios", "Público en general"],
             )
-                        st.markdown("---")
+            st.markdown("---")
             st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
                 "7.1 Frecuencia de Actualización General / Frecuencia Act:",
@@ -445,7 +448,7 @@ if not df_matriz.empty:
                         "Destinatarios": ", ".join(destinatarios) if isinstance(destinatarios, list) else destinatarios,
                         "Frecuencia Act": frec_act,
                         "Fecha Ultima Act": fecha_ultima,
-                        "Limitaciones": ", ".join(limitaciones) if isinstance(limitaciones, list) else limitaciones,
+                        "Limitaciones": ", ".join(limitaciones) if isinstance(limitaciones, list) else limitations,
                         "Otra Razon Limitacion": otra_razon_limitacion,
                         "Alineacion Planif": ", ".join(planificacion) if isinstance(planificacion, list) else planificacion,
                         "Ficha Metodologica": ficha_met,
