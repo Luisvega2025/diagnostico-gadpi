@@ -352,7 +352,7 @@ if not df_matriz.empty:
                 "6.4 Destinatarios de la Información (si aplica) / Destinatarios:",
                 ["Otras Direcciones GADPI", "GADs Cantonales / Parroquiales", "Ministerios", "Público en general"],
             )
-            st.markdown("---")
+                        st.markdown("---")
             st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
                 "7.1 Frecuencia de Actualización General / Frecuencia Act:",
@@ -434,7 +434,7 @@ if not df_matriz.empty:
                         "Genera Info Georreferenciada": genera_info_georref,
                         "Otras Fuentes GIS": otras_fuentes_gis,
                         "Tiene Metadatos": tiene_metadatos,
-                        "Unidad Medida": ... if 'unidad_medida' not in locals() else unidad_medida,
+                        "Unidad Medida": unidad_medida,
                         "Fuente Origen": fuente_origen,
                         "Nombre Fuente": nombre_fuente,
                         "Unidad Prov": unidad_prov,
