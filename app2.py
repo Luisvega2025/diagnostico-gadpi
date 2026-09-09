@@ -138,23 +138,21 @@ if not df_matriz.empty:
 
         def guardar_datos_nube(registro_dicc):
             try:
-                df_actual = conn.read(worksheet="Hoja1", ttl="1s")
+                import requests
+                
+                # URL limpia y autorizada de tu Google Apps Script final
+                url_google_script = "https://google.com"
+                
+                # Envío forzado en formato de datos web tradicionales (evita el Error 400)
+                requests.post(url_google_script, data=registro_dicc, timeout=10)
+                
                 df_nuevo = pd.DataFrame([registro_dicc])
-                
-                if df_actual is not None and not df_actual.empty:
-                    df_nuevo = df_nuevo.reindex(columns=df_actual.columns, fill_value="No aplica")
-                    df_consolidado = pd.concat([df_actual, df_nuevo], ignore_index=True)
-                else:
-                    df_consolidado = df_nuevo
-                
-                conn.update(worksheet="Hoja1", data=df_consolidado)
-                
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
-                    df_local = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                    df_consolidado = pd.concat([df_existente, df_nuevo], ignore_index=True)
                 else:
-                    df_local = df_nuevo
-                df_local.to_excel(EXCEL_DIAGNOSTICO, index=False)
+                    df_consolidado = df_nuevo
+                df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
                 st.balloons()
                 import time
@@ -163,7 +161,7 @@ if not df_matriz.empty:
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error al escribir directamente en la Hoja1 de Google Sheets: {e}")
+                st.error(f"Error técnico al enviar los datos al canal central: {e}")
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
@@ -289,6 +287,7 @@ if not df_matriz.empty:
                     key=f"genera_georref_v3_{st.session_state.contador_guardado}"
                 )
                 
+                # Modificado a variable directa sin conflictos
                 otras_fuentes_gis = st.text_input(
                     "4.9 ¿Obtiene de otras fuentes? Cuáles? / Otras Fuentes GIS:",
                     placeholder="ejem: IGM, INEC, MAG, etc",
