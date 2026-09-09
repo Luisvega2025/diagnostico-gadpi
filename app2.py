@@ -142,9 +142,6 @@ if not df_matriz.empty:
                 df_nuevo = pd.DataFrame([registro_dicc])
                 
                 if df_actual is not None and not df_actual.empty:
-                    for col in df_actual.columns:
-                        if col in df_nuevo.columns:
-                            df_nuevo[col] = df_nuevo[col].astype(df_actual[col].dtype, errors='ignore')
                     df_consolidado = pd.concat([df_actual, df_nuevo], ignore_index=True)
                 else:
                     df_consolidado = df_nuevo
@@ -291,12 +288,11 @@ if not df_matriz.empty:
                     key=f"genera_georref_v3_{st.session_state.contador_guardado}"
                 )
                 
-                oras_fuentes_gis = st.text_input(
+                otras_fuentes_gis = st.text_input(
                     "4.9 ¿Obtiene de otras fuentes? Cuáles? / Otras Fuentes GIS:",
                     placeholder="ejem: IGM, INEC, MAG, etc",
                     key=f"otras_fuentes_v3_{st.session_state.contador_guardado}"
                 )
-                otras_fuentes_gis = oras_fuentes_gis
                 
                 tiene_metadatos = st.text_input(
                     "4.10 ¿Tiene metadatos, catálogo de objetos? / Tiene Metadatos:",
