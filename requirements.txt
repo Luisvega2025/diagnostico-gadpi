@@ -2,3 +2,5 @@ streamlit
 pandas
 openpyxl
 requests
+st-files-connection
+streamlit-gsheets
