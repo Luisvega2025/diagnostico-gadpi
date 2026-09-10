@@ -1,5 +1,5 @@
 import os
-import json
+import time
 import pandas as pd
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
@@ -28,6 +28,7 @@ if not df_matriz.empty:
         page_title="Ficha Diagnostico GADPI - SIL", layout="centered"
     )
 
+    # Conexión directa con Google Sheets
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     if "contador_guardado" not in st.session_state:
@@ -111,7 +112,7 @@ if not df_matriz.empty:
         )
 
         try:
-            df_check = conn.read(worksheet="Hoja1", ttl="5s")
+            df_check = conn.read(worksheet="Hoja1", ttl="0s")
             if (
                 not df_check.empty
                 and "Producto" in df_check.columns
@@ -139,30 +140,36 @@ if not df_matriz.empty:
 
         def guardar_datos_nube(registro_dicc):
             try:
-                import requests
-                
-                url_google_script = "https://google.com"
-                
-                # Despacho en formato String puro para burlar bloqueos de red corporativos
-                headers = {"Content-Type": "application/json"}
-                requests.post(url_google_script, data=json.dumps(registro_dicc), headers=headers, timeout=10)
-                
                 df_nuevo = pd.DataFrame([registro_dicc])
+                
+                # 1. Guardar en Google Sheets usando st.connection
+                try:
+                    df_existente = conn.read(worksheet="Hoja1", ttl="0s")
+                    if not df_existente.empty:
+                        df_consolidado_gsheets = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                    else:
+                        df_consolidado_gsheets = df_nuevo
+                except Exception:
+                    df_consolidado_gsheets = df_nuevo
+
+                conn.update(worksheet="Hoja1", data=df_consolidado_gsheets)
+
+                # 2. Respaldar en archivo local Excel
                 if os.path.exists(EXCEL_DIAGNOSTICO):
-                    df_existente = pd.read_excel(EXCEL_DIAGNOSTICO)
-                    df_consolidado = pd.concat([df_existente, df_nuevo], ignore_index=True)
+                    df_existente_local = pd.read_excel(EXCEL_DIAGNOSTICO)
+                    df_consolidado_local = pd.concat([df_existente_local, df_nuevo], ignore_index=True)
                 else:
-                    df_consolidado = df_nuevo
-                df_consolidado.to_excel(EXCEL_DIAGNOSTICO, index=False)
+                    df_consolidado_local = df_nuevo
+                df_consolidado_local.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
                 st.balloons()
-                import time
                 time.sleep(1.5)
                 
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error técnico al enviar los datos al canal central: {e}")
+                st.error(f"Error técnico al guardar los datos en Google Sheets: {e}")
+
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
@@ -365,7 +372,7 @@ if not df_matriz.empty:
                 key=f"fechaultima_v3_{st.session_state.contador_guardado}",
             )
             limitaciones = st.multiselect(
-                "7.3 Principales Limitations para la Actualización / Limitaciones:",
+                "7.3 Principales Limitaciones para la Actualización / Limitaciones:",
                 ["Falta personal técnico", "Restricciones presupuestarias", "Software obsoleto", "Equipamiento insuficiente", "Falta normativa"],
                 key=f"limitaciones_v3_{st.session_state.contador_guardado}"
             )
@@ -376,7 +383,7 @@ if not df_matriz.empty:
             )
             ficha_met = st.radio("7.5 ¿Cuenta con Ficha Metodológica Formalizada? / Ficha Metodologica:", ["Sí", "No", "En proceso"], key=f"ficha_met_v3_{st.session_state.contador_guardado}")
             uni_resp_calcul = st.text_input(
-                "7.6 Unidad Responsible de la Ficha / Cálculo / Unidad Resp Calculo:",
+                "7.6 Unidad Responsable de la Ficha / Cálculo / Unidad Resp Calculo:",
                 placeholder="Nombre del departamento o perfil técnico",
                 key=f"uniresp_v3_{st.session_state.contador_guardado}",
             )
