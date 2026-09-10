@@ -2,10 +2,25 @@ import os
 import time
 import pandas as pd
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
+import gspread
+from google.oauth2.service_account import Credentials
 
 EXCEL_MATRIZ = "matriz_gad.xlsx"
 EXCEL_DIAGNOSTICO = "diagnostico_sil_gadpi_2026.xlsx"
+
+# --- CONFIGURACIÓN DE CONEXIÓN A GOOGLE SHEETS (GSPREAD) ---
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+
+@st.cache_resource
+def get_sheet_connection():
+    credentials_info = st.secrets["connections"]["gsheets"]
+    creds = Credentials.from_service_account_info(credentials_info, scopes=SCOPES)
+    gc = gspread.authorize(creds)
+    sh = gc.open_by_url(st.secrets["connections"]["gsheets"]["spreadsheet"])
+    return sh.sheet1
 
 @st.cache_data
 def cargar_matriz_limpia():
@@ -27,9 +42,6 @@ if not df_matriz.empty:
     st.set_page_config(
         page_title="Ficha Diagnostico GADPI - SIL", layout="centered"
     )
-
-    # Conexión directa con Google Sheets
-    conn = st.connection("gsheets", type=GSheetsConnection)
 
     if "contador_guardado" not in st.session_state:
         st.session_state.contador_guardado = 0
@@ -112,15 +124,17 @@ if not df_matriz.empty:
         )
 
         try:
-            df_check = conn.read(worksheet="Hoja1", ttl="0s")
-            if (
-                not df_check.empty
-                and "Producto" in df_check.columns
-                and (df_check["Producto"].astype(str).str.strip().eq(str(prod_opcion).strip()).any())
-            ):
-                st.info(
-                    "ℹ️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
-                )
+            sheet_check = get_sheet_connection()
+            records = sheet_check.get_all_records()
+            if records:
+                df_check = pd.DataFrame(records)
+                if (
+                    "Producto" in df_check.columns
+                    and (df_check["Producto"].astype(str).str.strip().eq(str(prod_opcion).strip()).any())
+                ):
+                    st.info(
+                        "ℹ️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
+                    )
         except:
             pass
 
@@ -140,21 +154,21 @@ if not df_matriz.empty:
 
         def guardar_datos_nube(registro_dicc):
             try:
-                df_nuevo = pd.DataFrame([registro_dicc])
+                sheet = get_sheet_connection()
                 
-                # 1. Guardar en Google Sheets usando st.connection
-                try:
-                    df_existente = conn.read(worksheet="Hoja1", ttl="0s")
-                    if not df_existente.empty:
-                        df_consolidado_gsheets = pd.concat([df_existente, df_nuevo], ignore_index=True)
-                    else:
-                        df_consolidado_gsheets = df_nuevo
-                except Exception:
-                    df_consolidado_gsheets = df_nuevo
-
-                conn.update(worksheet="Hoja1", data=df_consolidado_gsheets)
+                # 1. Guardar en Google Sheets usando gspread
+                # Obtener los encabezados actuales o definir nuevos según las claves del diccionario
+                headers = sheet.row_values(1)
+                if not headers:
+                    headers = list(registro_dicc.keys())
+                    sheet.append_row(headers)
+                
+                # Asegurar que los datos respeten el orden de los encabezados de la hoja
+                fila_valores = [str(registro_dicc.get(col, "")) for col in headers]
+                sheet.append_row(fila_valores)
 
                 # 2. Respaldar en archivo local Excel
+                df_nuevo = pd.DataFrame([registro_dicc])
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente_local = pd.read_excel(EXCEL_DIAGNOSTICO)
                     df_consolidado_local = pd.concat([df_existente_local, df_nuevo], ignore_index=True)
