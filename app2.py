@@ -19,7 +19,13 @@ def get_sheet_connection():
     credentials_info = st.secrets["connections"]["gsheets"]
     creds = Credentials.from_service_account_info(credentials_info, scopes=SCOPES)
     gc = gspread.authorize(creds)
-    sh = gc.open_by_url(st.secrets["connections"]["gsheets"]["spreadsheet"])
+    
+    url_or_id = st.secrets["connections"]["gsheets"]["spreadsheet"]
+    if "docs.google.com" in url_or_id:
+        sh = gc.open_by_url(url_or_id)
+    else:
+        sh = gc.open_by_key(url_or_id)
+        
     return sh.sheet1
 
 @st.cache_data
