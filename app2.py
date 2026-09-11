@@ -53,7 +53,7 @@ if not df_matriz.empty:
         st.session_state.contador_guardado = 0
 
     st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN Y COOPERACIÓN")
-    st.title("🏛️ Diagnostico de GestiÓn de Informacion - GADPI")
+    st.title("🏛️ Diagnóstico de Gestión de Informacion - GADPI")
     st.write(
         "Ficha tecnica oficial para el levantamiento de información, bases de datos y productos del SIL Geo-Imbabura."
     )
@@ -244,19 +244,19 @@ if not df_matriz.empty:
                 st.header("Sección 3: Datos Alfanuméricos/Estadísticos")
                 
                 nombre_ins_estad = st.text_input(
-                    "3.1 ¿Nombre del insumo de información estadística / alfanumérica que aporta a este producto? / nombre Ins Estad:",
+                    "3.1 ¿Nombre del insumo de información estadística / alfanumérica que aporta a este producto?",
                     placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
                     key=f"insumo_est_v3_{st.session_state.contador_guardado}"
                 )
                 
                 desag_est = st.multiselect(
-                    "3.2 Seleccione el nivel de desagregación de la información estadística / Desagregacion Est:",
+                    "3.2 Seleccione el nivel de desagregación de la información estadística:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                     key=f"desag_est_v3_{st.session_state.contador_guardado}"
                 )
                 
                 cobertura_est = st.text_input(
-                    "3.3 Temporalidad de Datos Estadísticos / Cobertura Temporal:",
+                    "3.3 Temporalidad de los Datos Estadísticos:",
                     placeholder="Ejemplo: 2018 - 2026",
                     key=f"cobertura_v3_{st.session_state.contador_guardado}",
                 )
@@ -269,60 +269,60 @@ if not df_matriz.empty:
                 st.header("Sección 4: Datos Geográficos (GIS)")
                 
                 nombre_insu_carto = st.text_input(
-                    "4.1 ¿Nombre del insumo de información cartográfica que aporta a este producto? / nombre Insu Carto:",
+                    "4.1 ¿Nombre del insumo cartográfica que aporta a este producto?",
                     placeholder="ejem: vias.shp/*nombre.mxd/nombre.gdb",
                     key=f"insumo_carto_v3_{st.session_state.contador_guardado}"
                 )
                 
                 genera_cart = st.radio(
-                    "4.2 ¿Genera o posee Datos Geográficos / Espaciales (GIS)? / genera cart:", 
+                    "4.2 ¿El insumo es generado por la unidad o jefatura?", 
                     ["Sí", "No"],
                     key=f"genera_cart_v3_{st.session_state.contador_guardado}"
                 )
                 
                 desag_gis = st.multiselect(
-                    "4.3 Seleccione el nivel de desagregación de la información Geográfica / Desagregacion GIS:",
+                    "4.3 Seleccione el nivel de desagregación de la información Geográfica:",
                     ["Provincial", "Cantonal", "Parroquial", "Sector / Comunidad", "Predio / Proyecto"],
                     key=f"desag_gis_v3_{st.session_state.contador_guardado}"
                 )
                 
                 anio_gis = st.text_input(
-                    "4.4 Año de Datos Geográficos / Anio GIS:",
+                    "4.4 Año de la información cartográfica:",
                     placeholder="Ejemplo: 2020 - 2026",
                     key=f"aniogis_v3_{st.session_state.contador_guardado}",
                 )
                 
                 escala_gis = st.selectbox(
-                    "4.5 Escala de la cartografía / Escala GIS:",
+                    "4.5 Escala de la cartografía:",
                     ["1:5.000", "1:25.000", "1:50.000", "1:100.000", "No"],
                     key=f"escala_gis_v3_{st.session_state.contador_guardado}"
                 )
                 
                 formato_gis = st.multiselect(
-                    "4.6 Formato de Datos Geográficos Disponibles / Formato GIS:",
+                    "4.6 Formato de los Datos Geográficos:",
                     ["File Geodatabase (.gdb)", "Shapefile (.shp)", "GeoJSON / KML", "Tabla XY (Excel / CSV)", "Servicio Web (WMS/WFS)"],
                     key=f"formato_gis_v3_{st.session_state.contador_guardado}"
                 )
                 
                 otro_formato_gis = st.text_input(
-                    "4.7 ¿Otro formato? / Otro Formato GIS:",
+                    "4.7 ¿Otro formato?:",
                     key=f"otro_formato_v3_{st.session_state.contador_guardado}"
                 )
                 
                 genera_info_georref = st.text_input(
-                    "4.8 ¿Genera información georreferenciada - Cartografía? / Genera Info Georreferenciada:",
-                    placeholder="ejem: si, archivo shp, maps mxd, etc",
+                    "4.8 ¿Que metodologia utiliza para generar la información cartográfica? ",
+                    placeholder="ejem: mediante topografía, vuelo con drones, etc",
                     key=f"genera_georref_v3_{st.session_state.contador_guardado}"
                 )
                 
                 otras_fuentes_gis = st.text_input(
-                    "4.9 ¿Obtiene de otras fuentes? Cuáles? / Otras Fuentes GIS:",
+                    "4.9 ¿Obtiene información espacial de otras fuentes? Cuáles?:",
                     placeholder="ejem: IGM, INEC, MAG, etc",
                     key=f"otras_fuentes_v3_{st.session_state.contador_guardado}"
                 )
                 
                 tiene_metadatos = st.text_input(
-                    "4.10 ¿Tiene metadatos, catálogo de objetos? / Tiene Metadatos:",
+                    "4.10 ¿La cartografia utilizada tiene metadatos, catálogo de objetos?:",
                     placeholder="si/no",
                     key=f"metadatos_v3_{st.session_state.contador_guardado}"
                 )
@@ -333,7 +333,7 @@ if not df_matriz.empty:
             
             if tipo_informacion == "Alfanumérica / Estadística":
                 unidad_medida = st.selectbox(
-                    "5.1 Unidad de Medida del Dato / Indicador / Unidad Medida:",
+                    "5.1 Unidad de Medida del Dato / Indicador:",
                     ["Kilómetros", "Hectáreas", "Porcentaje", "Número de usuarios", "Unidades", "No aplica"],
                     key=f"unidad_medida_v3_{st.session_state.contador_guardado}"
                 )
@@ -341,7 +341,7 @@ if not df_matriz.empty:
                 unidad_medida = "No aplica"
 
             fuente_origen = st.selectbox(
-                "5.2 Fuente de Origen del Dato / Fuente Origen:",
+                "5.2 Fuente de Origen del Dato:",
                 ["Interno GADPI", "Entidad Externa", "Mixto"],
                 key=f"fuente_origen_v3_{st.session_state.contador_guardado}"
             )
@@ -351,12 +351,12 @@ if not df_matriz.empty:
                 key=f"fuente_v3_{st.session_state.contador_guardado}",
             )
             unidad_prov = st.text_input(
-                "5.4 Unidad / Dirección Interna Proveedora (si aplica) / Unidad Prov:",
+                "5.4 Unidad / Dirección Interna Proveedora (si aplica):",
                 placeholder="Nombre de la unidad interna proveedora",
                 key=f"unidadprov_v3_{st.session_state.contador_guardado}",
             )
             inst_ext_prov = st.text_input(
-                "5.5 Institución Externa Proveedora (si aplica) / Inst Ext Prov:",
+                "5.5 Institución Externa Proveedora (si aplica):",
                 placeholder="Ejemplo: INEC, MAATE, MTOP, MAG, INAMHI",
                 key=f"instext_v3_{st.session_state.contador_guardado}",
             )
@@ -364,57 +364,57 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 6: Medios de Verificación y Flujos")
             medio_verif = st.multiselect(
-                "6.1 Medio de Verificación Disponible / Medio Verificacion:",
+                "6.1 Medio de Verificación Disponible:",
                 ["Físico (Archivo)", "Digital (Servidor/PC)", "Base de Datos", "Sistema Web"],
                 key=f"medio_verif_v3_{st.session_state.contador_guardado}"
             )
             ruta_archivo = st.text_input(
-                "6.2 Nombre de archivo, BD o Enlace del medio de verificación / Ruta/Enlace:",
-                placeholder="Ruta de red, enlace a Google Drive o repositorio",
+                "6.2 Nombre de archivo, BD o Enlace del medio de verificación:",
+                placeholder=", almacenamiento local, Ruta de red, enlace a Google Drive o repositorio",
                 key=f"ruta_v3_{st.session_state.contador_guardado}",
             )
-            difunde_terceros = st.radio("6.3 ¿Entrega o difunde este producto a terceros? / Difunde Terceros:", ["Sí", "No"], key=f"difunde_v3_{st.session_state.contador_guardado}")
+            difunde_terceros = st.radio("6.3 ¿Entrega o difunde este producto a terceros?:", ["Sí", "No"], key=f"difunde_v3_{st.session_state.contador_guardado}")
             destinatarios = st.multiselect(
-                "6.4 Destinatarios de la Información (si aplica) / Destinatarios:",
-                ["Otras Direcciones GADPI", "GADs Cantonales / Parroquiales", "Ministerios", "Público en general"],
+                "6.4 Destinatarios de la Información (si aplica):",
+                ["Otras Direcciones GADPI", "GADs Cantonales / Parroquiales", "Ministerios", "Público en general", "Ciudadania"],
                 key=f"destinatarios_v3_{st.session_state.contador_guardado}"
             )
             st.markdown("---")
             st.header("Sección 7: Gobernanza y Calidad")
             frec_act = st.selectbox(
-                "7.1 Frecuencia de Actualización General / Frecuencia Act:",
+                "7.1 Frecuencia de Actualización General:",
                 ["Continuo", "Mensual", "Trimestral", "Semestral", "Anual", "Por demanda", "No se actualizan"],
                 key=f"frec_act_v3_{st.session_state.contador_guardado}"
             )
             fecha_ultima = st.text_input(
-                "7.2 Fecha de Última Actualización de la información (AAAA/MM) / Fecha Ultima Act:",
+                "7.2 Fecha de Última Actualización de la información (AAAA/MM):",
                 placeholder="AAAA/MM",
                 key=f"fechaultima_v3_{st.session_state.contador_guardado}",
             )
             limitaciones = st.multiselect(
-                "7.3 Principales Limitaciones para la Actualización / Limitaciones:",
+                "7.3 Principales Limitaciones para la Actualización:",
                 ["Falta personal técnico", "Restricciones presupuestarias", "Software obsoleto", "Equipamiento insuficiente", "Falta normativa"],
                 key=f"limitaciones_v3_{st.session_state.contador_guardado}"
             )
             planificacion = st.multiselect(
-                "7.4 Alineación Marco de Planificación / Alineacion Planif:",
+                "7.4 Alineación Marco de Planificación:",
                 ["PDOT Imbabura", "POA Institucional", "ODS", "Competencias Ley / COOTAD"],
                 key=f"planificacion_v3_{st.session_state.contador_guardado}"
             )
-            ficha_met = st.radio("7.5 ¿Cuenta con Ficha Metodológica Formalizada? / Ficha Metodologica:", ["Sí", "No", "En proceso"], key=f"ficha_met_v3_{st.session_state.contador_guardado}")
+            ficha_met = st.radio("7.5 ¿Cuenta con Ficha Metodológica Formalizada?:", ["Sí", "No", "En proceso"], key=f"ficha_met_v3_{st.session_state.contador_guardado}")
             uni_resp_calcul = st.text_input(
-                "7.6 Unidad Responsable de la Ficha / Cálculo / Unidad Resp Calculo:",
+                "7.6 Unidad Responsable de la Ficha / Cálculo:",
                 placeholder="Nombre del departamento o perfil técnico",
                 key=f"uniresp_v3_{st.session_state.contador_guardado}",
             )
             riesgos_preserv = st.multiselect(
-                "7.7 Identificación de Riesgos de Preservación de la Información / Riesgos Preservacion:",
+                "7.7 Identificación de Riesgos de Preservación de la Información:",
                 ["Dependencia una persona", "Ausencia respaldos", "Virus/Fallos", "Rotación personal", "Deterioro papel"],
                 key=f"riesgos_v3_{st.session_state.contador_guardado}"
             )
             
             otra_razon_limitacion = st.text_input(
-                "7.8 ¿Otra razón? / Otra Razon Limitacion:",
+                "7.8 ¿Otra razón?:",
                 placeholder="describa",
                 key=f"otra_razon_v3_{st.session_state.contador_guardado}"
             )
@@ -422,18 +422,18 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 8: Usos de la Información")
             uso_interno = st.text_area(
-                "8.1 Uso Interno Actual de la Información / Uso Interno:",
+                "8.1 ¡Cual es el Uso Interno Actual de la Información?:",
                 placeholder="Mencione quien hace uso de la información generada",
                 key=f"usoint_v3_{st.session_state.contador_guardado}",
             )
             uso_sil = st.text_area(
-                "8.2 Potencial Uso / Integración en SIL GEO-IMBABURA / Integracion SIL:",
+                "8.2 Otros usus Potenciales de la información:",
                 placeholder="Como puede aprovecharse la información",
                 key=f"usosil_v3_{st.session_state.contador_guardado}",
             )
-            nivel_acceso = st.radio("8.3 Nivel de Acceso de la Información / Nivel Acceso:", ["Público", "Restringido", "Uso Interno únicamente"], key=f"nivel_acceso_v3_{st.session_state.contador_guardado}")
+            nivel_acceso = st.radio("8.3 Nivel de Acceso de la Información:", ["Público", "Restringido", "Uso Interno únicamente"], key=f"nivel_acceso_v3_{st.session_state.contador_guardado}")
             url_publicacion = st.text_input(
-                "8.4 Plataforma / Enlace Web de Publicación (si aplica) / URL Publicacion:",
+                "8.4 Plataforma / Enlace Web de Publicación (si aplica):",
                 placeholder="URL pública del geoportal o visor web",
                 key=f"urlpub_v3_{st.session_state.contador_guardado}",
             )
