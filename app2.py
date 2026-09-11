@@ -53,12 +53,12 @@ if not df_matriz.empty:
         st.session_state.contador_guardado = 0
 
     st.title("DIRECCIÓN GENERAL DE PLANIFICACIÓN Y COOPERACIÓN")
-    st.title("🏛️ Diagnorstico de Gestion de Informacion - GADPI")
+    st.title("🏛️ Diagnostico de GestiÓn de Informacion - GADPI")
     st.write(
-        "Ficha tecnica oficial para el levantamiento de informacion, bases de datos y productos del SIL Geo-Imbabura."
+        "Ficha tecnica oficial para el levantamiento de información, bases de datos y productos del SIL Geo-Imbabura."
     )
     st.info(
-        "✉️ **¿Preguntas o informacion adicional?** lvega@imbabura.gob.ec"
+        "✉️ **¿Preguntas o información adicional?** lvega@imbabura.gob.ec"
     )
 
     st.markdown("---")
@@ -98,19 +98,19 @@ if not df_matriz.empty:
     col_prod = next((c for c in columnas if "prod" in c.lower() or "est" in c.lower()), "Producto")
 
     try:
-        st.header("Seccion 1: Identificacion del Informante")
+        st.header("Seccion 1: Identificación del Informante")
         dir_opcion = st.selectbox(
-            "1.1 Direccion General / Area Sustantiva:",
+            "1.1 Seleccione Dirección:",
             sorted(df_matriz[col_dir].dropna().unique()),
         )
         df_f_sub = df_matriz[df_matriz[col_dir] == dir_opcion]
         sub_opcion = st.selectbox(
-            "1.2 Subdireccion / Jefatura / Unidad Organica:",
+            "1.2 Seleccione Subdirección / Jefatura / Unidad:",
             sorted(df_f_sub[col_sub].dropna().unique()),
         )
 
         tecnico_resp = st.text_input(
-            "1.3 Nombre del Tecnico Responsable del Llenado:",
+            "1.3 Nombre del Técnico Responsable del Llenado:",
             placeholder="Nombres y Apellidos completos",
             key=f"tecnico_{st.session_state.contador_guardado}",
         )
@@ -122,7 +122,7 @@ if not df_matriz.empty:
         
         correo_valido = True
         st.markdown("---")
-        st.header("Sección 2: Producto e Insumo según Estatuto 2026")
+        st.header("Sección 2: Producto e Insumos según Estatuto 2026")
         df_f_prod = df_f_sub[df_f_sub[col_sub] == sub_opcion]
         prod_opcion = st.selectbox(
             "2.1 Seleccione el Producto Institucional del Estatuto Orgánico:",
