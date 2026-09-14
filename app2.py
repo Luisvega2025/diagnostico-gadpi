@@ -365,7 +365,7 @@ if not df_matriz.empty:
             st.header("Sección 6: Medios de Verificación y Flujos")
             medio_verif = st.multiselect(
                 "6.1 Medio de Verificación Disponible:",
-                ["Físico (Archivo)", "Digital (Servidor/PC)", "Base de Datos", "Sistema Web"],
+                ["Físico (Archivo)", "Digital (Servidor/PC)", "Base de Datos", "Sistema Web", "No existen"],
                 key=f"medio_verif_v3_{st.session_state.contador_guardado}"
             )
             ruta_archivo = st.text_input(
