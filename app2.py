@@ -16,17 +16,53 @@ SCOPES = [
 
 @st.cache_resource
 def get_sheet_connection():
-    credentials_info = st.secrets["connections"]["gsheets"]
-    creds = Credentials.from_service_account_info(credentials_info, scopes=SCOPES)
-    gc = gspread.authorize(creds)
-    
-    url_or_id = st.secrets["connections"]["gsheets"]["spreadsheet"]
-    if "docs.google.com" in url_or_id:
-        sh = gc.open_by_url(url_or_id)
-    else:
-        sh = gc.open_by_key(url_or_id)
+    try:
+        st.write("🔎 Paso 1: leyendo Secrets...")
         
-    return sh.sheet1
+        credentials_info = st.secrets["connections"]["gsheets"]
+
+        st.write("✅ Paso 1 correcto")
+
+        st.write("🔎 Paso 2: creando credenciales...")
+
+        creds = Credentials.from_service_account_info(
+            credentials_info,
+            scopes=SCOPES
+        )
+
+        st.write("✅ Paso 2 correcto")
+
+        st.write("🔎 Paso 3: autorizando gspread...")
+
+        gc = gspread.authorize(creds)
+
+        st.write("✅ Paso 3 correcto")
+
+        url_or_id = credentials_info["spreadsheet"]
+
+        st.write("🔎 Paso 4: abriendo Google Sheet...")
+
+        if "docs.google.com" in url_or_id:
+            sh = gc.open_by_url(url_or_id)
+        else:
+            sh = gc.open_by_key(url_or_id)
+
+        st.write("✅ Paso 4 correcto")
+        st.write(f"📊 Archivo encontrado: {sh.title}")
+
+        worksheet = sh.sheet1
+
+        st.write(f"📄 Hoja encontrada: {worksheet.title}")
+
+        return worksheet
+
+    except Exception as e:
+        st.error(
+            f"❌ ERROR GOOGLE SHEETS\n\n"
+            f"Tipo: {type(e).__name__}\n\n"
+            f"Mensaje: {str(e)}"
+        )
+        st.stop()
 
 @st.cache_data
 def cargar_matriz_limpia():
