@@ -397,8 +397,8 @@ if not df_matriz.empty:
                 key=f"limitaciones_v3_{st.session_state.contador_guardado}"
             )
             planificacion = st.multiselect(
-                "7.4 Alineación con instrumentos de Planificación:",
-                ["PDOT Imbabura", "POA Institucional", "ODS", "Competencias Ley / COOTAD"],
+                "7.4 ¿La información gestionada esta alineada con instrumentos de Planificación?:",
+                ["Indicadores institucionales", "PDOT Imbabura", "POA Institucional", "ODS", "Competencias Ley / COOTAD"],
                 key=f"planificacion_v3_{st.session_state.contador_guardado}"
             )
             ficha_met = st.radio("7.5 ¿Cuenta con Ficha Metodológica Formalizada?:", ["Sí", "No", "En proceso"], key=f"ficha_met_v3_{st.session_state.contador_guardado}")
