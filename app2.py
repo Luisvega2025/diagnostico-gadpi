@@ -141,7 +141,7 @@ if not df_matriz.empty:
                     st.info(
                         "ℹ️ Este producto ya cuenta con registros previos en la nube. Estás agregando un nuevo insumo/componente para este mismo producto."
                     )
-        except:
+        except Exception:
             pass
 
         aplica_info = st.radio(
@@ -162,17 +162,17 @@ if not df_matriz.empty:
             try:
                 sheet = get_sheet_connection()
                 
-                # 1. Guardar en Google Sheets usando gspread
+                # Obtener encabezados existentes o definir nuevos si la hoja está vacía
                 headers = sheet.row_values(1)
                 if not headers:
                     headers = list(registro_dicc.keys())
-                    sheet.append_row(headers)
+                    sheet.append_row(headers, value_input_option="USER_ENTERED")
                 
-                # Asegurar que los datos respeten el orden de los encabezados de la hoja
+                # Mapear valores asegurando el orden correcto de columnas
                 fila_valores = [str(registro_dicc.get(col, "")) for col in headers]
-                sheet.append_row(fila_valores)
+                sheet.append_row(fila_valores, value_input_option="USER_ENTERED")
 
-                # 2. Respaldar en archivo local Excel
+                # Respaldo en Excel local
                 df_nuevo = pd.DataFrame([registro_dicc])
                 if os.path.exists(EXCEL_DIAGNOSTICO):
                     df_existente_local = pd.read_excel(EXCEL_DIAGNOSTICO)
@@ -181,13 +181,14 @@ if not df_matriz.empty:
                     df_consolidado_local = df_nuevo
                 df_consolidado_local.to_excel(EXCEL_DIAGNOSTICO, index=False)
                 
+                st.success("✅ ¡Datos guardados exitosamente en Google Sheets y localmente!")
                 st.balloons()
                 time.sleep(1.5)
                 
                 st.session_state.contador_guardado += 1
                 st.rerun()
             except Exception as e:
-                st.error(f"Error técnico al guardar los datos en Google Sheets: {e}")
+                st.error(f"❌ Error al intentar guardar en Google Sheets: {type(e).__name__} - {str(e)}")
 
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
