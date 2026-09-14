@@ -401,15 +401,15 @@ if not df_matriz.empty:
                 ["Indicadores institucionales", "PDOT Imbabura", "POA Institucional", "ODS", "Competencias Ley / COOTAD"],
                 key=f"planificacion_v3_{st.session_state.contador_guardado}"
             )
-            ficha_met = st.radio("7.5 ¿Cuenta con Ficha Metodológica Formalizada?:", ["Sí", "No", "En proceso"], key=f"ficha_met_v3_{st.session_state.contador_guardado}")
+            ficha_met = st.radio("7.5 Si la información gestionada esta consolidada en un indicador, ¿Cuenta con Ficha Metodológica?:", ["Sí", "No", "En proceso"], key=f"ficha_met_v3_{st.session_state.contador_guardado}")
             uni_resp_calcul = st.text_input(
-                "7.6 Unidad Responsable de la Ficha / Cálculo:",
+                "7.6 Unidad Responsable de la Ficha / Cálculo (Si aplica):",
                 placeholder="Nombre del departamento o perfil técnico",
                 key=f"uniresp_v3_{st.session_state.contador_guardado}",
             )
             riesgos_preserv = st.multiselect(
-                "7.7 Identificación de Riesgos de Preservación de la Información:",
-                ["Dependencia una persona", "Ausencia respaldos", "Virus/Fallos", "Rotación personal", "Deterioro papel"],
+                "7.7 Identifique los Riesgos para Preservar la Información gestionada por su unidad:",
+                ["Dependencia una persona", "Ausencia respaldos", "Virus/Fallos", "Rotación de personal", "No aplica"],
                 key=f"riesgos_v3_{st.session_state.contador_guardado}"
             )
             
