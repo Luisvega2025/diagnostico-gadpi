@@ -393,7 +393,7 @@ if not df_matriz.empty:
             )
             limitaciones = st.multiselect(
                 "7.3 Principales Limitaciones para la Actualización:",
-                ["Falta personal técnico", "Restricciones presupuestarias", "Software obsoleto", "Equipamiento insuficiente", "Falta normativa"],
+                ["Falta personal técnico", "Restricciones presupuestarias", "Problemas tecnológicos/conectividad", "Equipamiento insuficiente", "Falta normativa", "No hay acceso a fuentes primarias de información"],
                 key=f"limitaciones_v3_{st.session_state.contador_guardado}"
             )
             planificacion = st.multiselect(
