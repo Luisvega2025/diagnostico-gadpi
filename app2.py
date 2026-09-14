@@ -163,7 +163,6 @@ if not df_matriz.empty:
                 sheet = get_sheet_connection()
                 
                 # 1. Guardar en Google Sheets usando gspread
-                # Obtener los encabezados actuales o definir nuevos según las claves del diccionario
                 headers = sheet.row_values(1)
                 if not headers:
                     headers = list(registro_dicc.keys())
@@ -328,6 +327,7 @@ if not df_matriz.empty:
                 )
                 
                 nombre_ins_estad, desag_est, cobertura_est = "No aplica", ["No aplica"], "No aplica"
+
             st.markdown("---")
             st.header("Sección 5: Fuentes y Origen del Dato")
             
