@@ -346,17 +346,17 @@ if not df_matriz.empty:
                 key=f"fuente_origen_v3_{st.session_state.contador_guardado}"
             )
             nombre_fuente = st.text_input(
-                "5.3 Nombre de la fuente/proveedor / Nombre Fuente:",
+                "5.3 Nombre del producto / insumo:",
                 placeholder="Nombre del sistema, censo, catastro o plataforma",
                 key=f"fuente_v3_{st.session_state.contador_guardado}",
             )
             unidad_prov = st.text_input(
-                "5.4 Unidad / Dirección Interna Proveedora (si aplica):",
+                "5.4 En caso de que el proveedor sea interno nombre de la Unidad / Dirección:",
                 placeholder="Nombre de la unidad interna proveedora",
                 key=f"unidadprov_v3_{st.session_state.contador_guardado}",
             )
             inst_ext_prov = st.text_input(
-                "5.5 Institución Externa Proveedora (si aplica):",
+                "5.5 En caso de proveedor externo -nombre de la Institución:",
                 placeholder="Ejemplo: INEC, MAATE, MTOP, MAG, INAMHI",
                 key=f"instext_v3_{st.session_state.contador_guardado}",
             )
