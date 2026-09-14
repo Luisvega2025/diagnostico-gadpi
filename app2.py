@@ -422,13 +422,13 @@ if not df_matriz.empty:
             st.markdown("---")
             st.header("Sección 8: Usos de la Información")
             uso_interno = st.text_area(
-                "8.1 ¡Cual es el Uso Interno Actual de la Información?:",
-                placeholder="Mencione quien hace uso de la información generada",
+                "8.1 ¿Mencione otros usos de la Información gestionada por su unidad?:",
+                placeholder="Ej: en planificación, informes de gestión, atención ciudadana, etc.",
                 key=f"usoint_v3_{st.session_state.contador_guardado}",
             )
             uso_sil = st.text_area(
                 "8.2 Otros usos Potenciales de la información:",
-                placeholder="Como puede aprovecharse la información",
+                placeholder="compartir con otras instituciones, para visualización pública, generar alertas, etc.",
                 key=f"usosil_v3_{st.session_state.contador_guardado}",
             )
             nivel_acceso = st.radio("8.3 Nivel de Acceso de la Información:", ["Público", "Restringido", "Uso Interno únicamente"], key=f"nivel_acceso_v3_{st.session_state.contador_guardado}")
