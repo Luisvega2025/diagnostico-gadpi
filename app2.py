@@ -158,38 +158,31 @@ if not df_matriz.empty:
 
         st.info("ℹ️ **SI TIENE LOS DOS TIPOS DE INFORMACIÓN SE DEBE LLENAR UN REGISTRO A LA VEZ POR INSUMO (alfanumérico o Cartográfico)**")
 
-        def guardar_datos_nube(registro_dicc):
-            try:
-                sheet = get_sheet_connection()
-                
-                # 1. Guardar en Google Sheets usando gspread
-                # Obtener los encabezados actuales o definir nuevos según las claves del diccionario
-                headers = sheet.row_values(1)
-                if not headers:
-                    headers = list(registro_dicc.keys())
-                    sheet.append_row(headers)
-                
-                # Asegurar que los datos respeten el orden de los encabezados de la hoja
-                fila_valores = [str(registro_dicc.get(col, "")) for col in headers]
-                sheet.append_row(fila_valores)
+def guardar_datos_nube(registro_dicc):
+    try:
+        sheet = get_sheet_connection()
+        
+        # 1. Obtiene los encabezados actuales de la Fila 1
+        headers = sheet.row_values(1)
+        
+        # Si la Fila 1 está totalmente vacía, escribe los nombres exactos de las columnas del código
+        if not headers:
+            headers = list(registro_dicc.keys())
+            sheet.append_row(headers)
+        
+        # 2. Asocia los datos a los encabezados
+        fila_valores = [str(registro_dicc.get(col, "")) for col in headers]
+        
+        # 3. Agrega la fila de datos
+        sheet.append_row(fila_valores)
 
-                # 2. Respaldar en archivo local Excel
-                df_nuevo = pd.DataFrame([registro_dicc])
-                if os.path.exists(EXCEL_DIAGNOSTICO):
-                    df_existente_local = pd.read_excel(EXCEL_DIAGNOSTICO)
-                    df_consolidado_local = pd.concat([df_existente_local, df_nuevo], ignore_index=True)
-                else:
-                    df_consolidado_local = df_nuevo
-                df_consolidado_local.to_excel(EXCEL_DIAGNOSTICO, index=False)
-                
-                st.balloons()
-                time.sleep(1.5)
-                
-                st.session_state.contador_guardado += 1
-                st.rerun()
-            except Exception as e:
-                st.error(f"Error técnico al guardar los datos en Google Sheets: {e}")
-
+        st.balloons()
+        time.sleep(1.5)
+        st.session_state.contador_guardado += 1
+        st.rerun()
+    except Exception as e:
+        st.error(f"Error al guardar datos: {e}")
+    
         if aplica_info == "No":
             st.warning("Ha seleccionado que NO aplica información para este producto. Guarde el registro para finalizar.")
             if st.button("💾 Guardar Producto (No Aplica)", type="secondary"):
