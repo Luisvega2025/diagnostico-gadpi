@@ -1011,8 +1011,8 @@ try:
         )
 
         nombre_fuente = st.text_input(
-            "5.3 Nombre del producto / insumo:",
-            placeholder="Nombre del sistema, censo, catastro o plataforma",
+            "5.3 En caso de utilizar otros insumos para generar el actual, detalle:",
+            placeholder="Nombre del insumo, NO aplica",
             key=f"fuente_v3_{st.session_state.contador_guardado}"
         )
 
