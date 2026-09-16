@@ -1195,7 +1195,7 @@ try:
         )
 
         uso_sil = st.text_area(
-            "8.2 Otros usos Potenciales de la información:",
+            "8.2 Observaciones / Recomendaciones:",
             placeholder=(
                 "compartir con otras instituciones, "
                 "para visualización pública, generar alertas, etc."
