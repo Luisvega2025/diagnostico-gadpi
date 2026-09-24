@@ -862,7 +862,8 @@ try:
                     "Cantonal",
                     "Parroquial",
                     "Sector / Comunidad",
-                    "Predio / Proyecto"
+                    "Predio / Proyecto",
+                    "No Aplica"
                 ],
                 key=f"desag_est_v3_{st.session_state.contador_guardado}"
             )
