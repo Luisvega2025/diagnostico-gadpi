@@ -1071,6 +1071,7 @@ try:
             "6.4 Destinatarios de la Información (si aplica):",
             [
                 "Otras Direcciones GADPI",
+                "Otras Instituciones Públicas",
                 "GADs Cantonales / Parroquiales",
                 "Ministerios",
                 "Público en general",
