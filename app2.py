@@ -1,6 +1,7 @@
 import os
 import io
 import time
+import uuid
 import pandas as pd
 import streamlit as st
 import gspread
@@ -223,6 +224,23 @@ def guardar_respaldo_local(registro):
 def guardar_datos_nube(registro):
 
     # --------------------------------------------------------
+    # Generar identificador único ANTES de escribir en Google.
+    # Esto permite comprobar que Google recibió exactamente
+    # esta ficha y evita duplicados cuando una petición tarda
+    # o se repite.
+    # --------------------------------------------------------
+
+    if not registro.get("ID Registro"):
+        registro["ID Registro"] = (
+            "SIL-"
+            + pd.Timestamp.now().strftime("%Y%m%d-%H%M%S")
+            + "-"
+            + uuid.uuid4().hex[:8].upper()
+        )
+
+    id_registro = str(registro["ID Registro"])
+
+    # --------------------------------------------------------
     # Intentar conectar
     # --------------------------------------------------------
 
@@ -241,8 +259,8 @@ def guardar_datos_nube(registro):
         )
 
         st.warning(
-            "Revisa la configuración de Secrets en "
-            "Streamlit Cloud. El formulario NO se ha guardado."
+            "El formulario NO se ha guardado. "
+            "No se generó confirmación de registro."
         )
 
         return False
@@ -297,6 +315,42 @@ def guardar_datos_nube(registro):
             return False
 
     # --------------------------------------------------------
+    # Asegurar que todas las columnas del registro existan.
+    # Esto evita perder campos nuevos si se agregan al formulario.
+    # --------------------------------------------------------
+
+    columnas_faltantes = [
+        columna
+        for columna in registro.keys()
+        if columna not in headers
+    ]
+
+    if columnas_faltantes:
+
+        try:
+            for columna in columnas_faltantes:
+                sheet.update_cell(
+                    1,
+                    len(headers) + 1,
+                    columna
+                )
+                headers.append(columna)
+
+        except Exception as e:
+
+            st.error(
+                "❌ No se pudieron actualizar los encabezados "
+                "de Google Sheets."
+            )
+
+            st.code(
+                f"{type(e).__name__}: {str(e)}",
+                language="text"
+            )
+
+            return False
+
+    # --------------------------------------------------------
     # Preparar fila
     # --------------------------------------------------------
 
@@ -330,9 +384,35 @@ def guardar_datos_nube(registro):
 
     except Exception as e:
 
+        # ----------------------------------------------------
+        # MUY IMPORTANTE:
+        # Si Google pudo recibir la petición pero la respuesta
+        # tardó o se perdió, comprobamos el ID antes de informar
+        # que falló. Así evitamos duplicar registros.
+        # ----------------------------------------------------
+
+        try:
+            celda_id = sheet.find(id_registro)
+
+            if celda_id:
+                st.success(
+                    "✅ El registro fue recibido por Google Sheets "
+                    "y quedó confirmado."
+                )
+
+                guardar_respaldo_local(registro)
+
+                st.session_state.contador_guardado += 1
+
+                st.rerun()
+
+                return True
+
+        except Exception:
+            pass
+
         st.error(
-            "❌ LA CONEXIÓN CON GOOGLE FUNCIONÓ, "
-            "PERO NO SE PUDO ESCRIBIR LA FILA."
+            "❌ NO SE PUDO CONFIRMAR EL GUARDADO EN GOOGLE SHEETS."
         )
 
         st.code(
@@ -341,14 +421,55 @@ def guardar_datos_nube(registro):
         )
 
         st.warning(
-            "Esto normalmente indica un problema de permisos "
-            "de la cuenta de servicio sobre el archivo de Google Sheets."
+            "Por seguridad, el registro NO se considera guardado "
+            "hasta poder confirmarlo en Google Sheets."
         )
 
         return False
 
     # --------------------------------------------------------
-    # Respaldo local
+    # VERIFICACIÓN REAL DEL REGISTRO
+    # --------------------------------------------------------
+
+    try:
+
+        celda_id = sheet.find(id_registro)
+
+        if not celda_id:
+            st.error(
+                "❌ Google Sheets respondió al envío, "
+                "pero NO se pudo verificar el ID del registro."
+            )
+
+            st.warning(
+                "Por seguridad, el registro NO se considera "
+                "confirmado. Revise Google Sheets antes de repetir "
+                "el envío."
+            )
+
+            return False
+
+    except Exception as e:
+
+        st.error(
+            "❌ El registro fue enviado, pero no se pudo verificar "
+            "su existencia en Google Sheets."
+        )
+
+        st.code(
+            f"{type(e).__name__}: {str(e)}",
+            language="text"
+        )
+
+        st.warning(
+            "Por seguridad, NO se creó un segundo registro "
+            "automáticamente."
+        )
+
+        return False
+
+    # --------------------------------------------------------
+    # Respaldo local: solamente DESPUÉS de verificar Google.
     # --------------------------------------------------------
 
     guardar_respaldo_local(registro)
@@ -358,7 +479,11 @@ def guardar_datos_nube(registro):
     # --------------------------------------------------------
 
     st.success(
-        "✅ ¡Datos guardados correctamente en Google Sheets!"
+        "✅ ¡Datos guardados y verificados correctamente en Google Sheets!"
+    )
+
+    st.info(
+        f"ID de registro: {id_registro}"
     )
 
     st.balloons()
@@ -477,50 +602,63 @@ if clave_admin == "gadpi2026":
 
     st.sidebar.success("Acceso Autorizado 🎈")
 
-    if os.path.exists(EXCEL_DIAGNOSTICO):
+    if st.sidebar.button("📥 Preparar Excel desde Google Sheets"):
 
         try:
 
-            df_descarga = pd.read_excel(
-                EXCEL_DIAGNOSTICO
-            )
+            sheet_admin = get_sheet_connection()
 
-            buffer = io.BytesIO()
+            registros_google = sheet_admin.get_all_records()
 
-            with pd.ExcelWriter(
-                buffer,
-                engine="openpyxl"
-            ) as writer:
+            if registros_google:
 
-                df_descarga.to_excel(
-                    writer,
-                    index=False
+                df_descarga = pd.DataFrame(registros_google)
+
+                buffer = io.BytesIO()
+
+                with pd.ExcelWriter(
+                    buffer,
+                    engine="openpyxl"
+                ) as writer:
+
+                    df_descarga.to_excel(
+                        writer,
+                        index=False
+                    )
+
+                buffer.seek(0)
+
+                st.sidebar.download_button(
+                    label="⬇️ Descargar Excel Consolidado",
+                    data=buffer,
+                    file_name="diagnostico_sil_gadpi_2026.xlsx",
+                    mime=(
+                        "application/vnd.openxmlformats-officedocument."
+                        "spreadsheetml.sheet"
+                    )
                 )
 
-            buffer.seek(0)
-
-            st.sidebar.download_button(
-                label="📥 Descargar Excel Consolidado",
-                data=buffer,
-                file_name="diagnostico_sil_gadpi_2026.xlsx",
-                mime=(
-                    "application/vnd.openxmlformats-officedocument."
-                    "spreadsheetml.sheet"
+                st.sidebar.success(
+                    f"Excel preparado con {len(df_descarga)} "
+                    "registros de Google Sheets."
                 )
-            )
+
+            else:
+
+                st.sidebar.info(
+                    "Google Sheets no contiene registros para descargar."
+                )
 
         except Exception as e:
 
             st.sidebar.error(
-                f"Error al procesar el archivo: {e}"
+                "❌ No se pudo preparar el Excel desde Google Sheets."
             )
 
-    else:
-
-        st.sidebar.info(
-            "Aún no se registran fichas técnicas "
-            "en el respaldo local."
-        )
+            st.sidebar.code(
+                f"{type(e).__name__}: {str(e)}",
+                language="text"
+            )
 
 
 # ============================================================
@@ -862,8 +1000,7 @@ try:
                     "Cantonal",
                     "Parroquial",
                     "Sector / Comunidad",
-                    "Predio / Proyecto",
-                    "No Aplica"
+                    "Predio / Proyecto"
                 ],
                 key=f"desag_est_v3_{st.session_state.contador_guardado}"
             )
@@ -888,7 +1025,7 @@ try:
             )
 
             nombre_insu_carto = st.text_input(
-                "4.1 ¿Nombre del insumo o dato cartográfico "
+                "4.1 ¿Nombre del insumo cartográfico "
                 "que aporta a este producto?",
                 placeholder="ejem: vias.shp/*nombre.mxd/nombre.gdb",
                 key=f"insumo_carto_v3_{st.session_state.contador_guardado}"
@@ -1012,8 +1149,8 @@ try:
         )
 
         nombre_fuente = st.text_input(
-            "5.3 En caso de utilizar otros insumos para generar el actual, detalle:",
-            placeholder="Nombre del insumo, NO aplica",
+            "5.3 Nombre del producto / insumo:",
+            placeholder="Nombre del sistema, censo, catastro o plataforma",
             key=f"fuente_v3_{st.session_state.contador_guardado}"
         )
 
@@ -1071,7 +1208,6 @@ try:
             "6.4 Destinatarios de la Información (si aplica):",
             [
                 "Otras Direcciones GADPI",
-                "Otras Instituciones Públicas",
                 "GADs Cantonales / Parroquiales",
                 "Ministerios",
                 "Público en general",
@@ -1197,7 +1333,7 @@ try:
         )
 
         uso_sil = st.text_area(
-            "8.2 Observaciones / Recomendaciones:",
+            "8.2 Otros usos Potenciales de la información:",
             placeholder=(
                 "compartir con otras instituciones, "
                 "para visualización pública, generar alertas, etc."
