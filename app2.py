@@ -888,7 +888,7 @@ try:
             )
 
             nombre_insu_carto = st.text_input(
-                "4.1 ¿Nombre del insumo cartográfico "
+                "4.1 ¿Nombre del insumo o dato cartográfico "
                 "que aporta a este producto?",
                 placeholder="ejem: vias.shp/*nombre.mxd/nombre.gdb",
                 key=f"insumo_carto_v3_{st.session_state.contador_guardado}"
