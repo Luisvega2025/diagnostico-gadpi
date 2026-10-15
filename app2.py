@@ -987,8 +987,8 @@ try:
 
             nombre_ins_estad = st.text_input(
                 "3.1 ¿Nombre del insumo de información "
-                "estadística / alfanumérica que aporta a este producto?",
-                placeholder="ejem: usuarios_canal_riego.*/doc/pdf/xls/",
+                "estadística / alfanumérica o datos que aporten a cumplir producto?",
+                placeholder="ejem: dato de nro usuarios de canal/doc/pdf/xls/",
                 key=f"insumo_est_v3_{st.session_state.contador_guardado}"
             )
 
@@ -1000,7 +1000,8 @@ try:
                     "Cantonal",
                     "Parroquial",
                     "Sector / Comunidad",
-                    "Predio / Proyecto"
+                    "Predio / Proyecto",
+                    "Institucional"
                 ],
                 key=f"desag_est_v3_{st.session_state.contador_guardado}"
             )
@@ -1211,7 +1212,8 @@ try:
                 "GADs Cantonales / Parroquiales",
                 "Ministerios",
                 "Público en general",
-                "Ciudadanía"
+                "Ciudadanía",
+                "Solo Interno"
             ],
             key=f"destinatarios_v3_{st.session_state.contador_guardado}"
         )
@@ -1300,6 +1302,7 @@ try:
                 "Ausencia respaldos",
                 "Virus/Fallos",
                 "Rotación de personal",
+                "Dependencia Externa",
                 "No aplica"
             ],
             key=f"riesgos_v3_{st.session_state.contador_guardado}"
